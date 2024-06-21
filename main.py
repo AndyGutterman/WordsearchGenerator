@@ -1,7 +1,5 @@
-import random
 
-
-def takeWords():
+def take_words():
     words = []
     spacesRemaining = size * size
 
@@ -86,7 +84,7 @@ def place_vertical(letters, size, wordsearch, max_attempts=1000):
 
 import random
 
-def placeWords(wordSearch, words):
+def place_words(wordSearch, words):
     size = len(wordSearch)
     words.sort(key=len, reverse=True)  # Sort words by length in descending order
 
@@ -156,7 +154,7 @@ def fill_grid(wordSearch):  # Fill spaces with value '0' with random characters
                 row[i] = randchar
 
 
-def showGame(wordSearch, words):
+def show_game(wordSearch, words):
     print("\n\nWord Search:")
     for row in wordSearch:
         elements_to_print = []
@@ -184,10 +182,10 @@ def txt_print(wordsearch, file_name):
 if __name__ == '__main__':
     size = int(input("Enter a size for the wordSearch:\n>>> "))
     wordSearch = [[0] * size for i in range(size)]
-    words = takeWords()
-    placeWords(wordSearch, words)
+    words = take_words()
+    place_words(wordSearch, words)
     fill_grid(wordSearch)
-    showGame(wordSearch, words)
+    show_game(wordSearch, words)
 
     file_name = input("Enter a filename:\n>>> ")
     txt_print(wordSearch, file_name)
