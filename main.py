@@ -11,10 +11,9 @@ def takeWords():
 
         if word == 'DONE' or spacesRemaining < 0:
             break
-
         if len(word) <= size and len(word) <= spacesRemaining:  # Corrected the logical operator to 'and'
             words.append(word)
-            spacesRemaining -= len(word)  # Updated shorthand notation
+            spacesRemaining -= len(word)
             print("You have " + str(spacesRemaining) + " characters left")
         else:
             print("The word you've typed is too large, please choose another word")
@@ -22,7 +21,7 @@ def takeWords():
     return words
 
 
-def place_Diagonal(letters, size, wordsearch, max_attempts=1000):
+def place_diagonal(letters, size, wordsearch, max_attempts=1000):
     attempts = 0
     while attempts < max_attempts:
         can_place_word = True
@@ -49,7 +48,6 @@ def place_horizontal(letters, size, wordsearch, max_attempts=1000):
         can_place_word = True
         row_num = random.randint(0, size - 1)
         column_num = random.randint(0, size - len(letters))
-        intersections = 0
 
         for i in range(len(letters)):
             current_char = wordsearch[row_num][column_num + i]
@@ -86,48 +84,68 @@ def place_vertical(letters, size, wordsearch, max_attempts=1000):
     return False
 
 
-def placeWords(wordSearch, fullWords):
+import random
+
+def placeWords(wordSearch, words):
     size = len(wordSearch)
-    fullWords.sort(key=len, reverse=True)  # Sort words by length in descending order
+    words.sort(key=len, reverse=True)  # Sort words by length in descending order
 
-    LimitWords = 0
-    for word in fullWords:
-        if len(word) == size:
-            LimitWords += 1
+    attempts = 0
+    limit_words = sum(1 for word in words if len(word) == size)
 
-    if LimitWords > 1:
-        print(f"There are {LimitWords} words with length equal to the size of the array.")
-        for word in fullWords:
-            letters = list(word)
-            placed = False
-            while not placed:
-                r = random.randint(1, 2)
-                if r == 1:
-                    placed = place_vertical(letters, size, wordSearch)
-                    if placed:
-                        print(word + " placed vertically")
-                elif r == 2:
-                    placed = place_horizontal(letters, size, wordSearch)
-                    if placed:
-                        print(word + " placed horizontally")
-    else:
-        for word in fullWords:
-            letters = list(word)
-            placed = False
-            while not placed:
-                r = random.randint(1, 3)
-                if r == 1:
-                    placed = place_vertical(letters, size, wordSearch)
-                    if placed:
-                        print(word + " placed vertically")
-                elif r == 2:
-                    placed = place_horizontal(letters, size, wordSearch)
-                    if placed:
-                        print(word + " placed horizontally")
-                elif r == 3:
-                    placed = place_Diagonal(letters, size, wordSearch)
-                    if placed:
-                        print(word + " placed diagonally")
+    while attempts < 1000:
+        wordsPlaced = 0
+        if attempts > 0:
+            wordSearch = [[0] * size for _ in range(size)]
+
+        if limit_words > 1:
+            print(f"There are {limit_words} words with length equal to the size of the array.")
+            for word in words:
+                if len(word) == size:
+                    letters = list(word)
+                    placed = False
+                    while not placed:
+                        r = random.randint(1, 2)
+                        if r == 1:
+                            placed = place_vertical(letters, size, wordSearch)
+                            if placed:
+                                print(word + " placed vertically")
+                                wordsPlaced += 1
+                        elif r == 2:
+                            placed = place_horizontal(letters, size, wordSearch)
+                            if placed:
+                                print(word + " placed horizontally")
+                                wordsPlaced += 1
+        else:
+            for word in words:
+                letters = list(word)
+                placed = False
+                while not placed:
+                    r = random.randint(1, 3)
+                    if r == 1:
+                        placed = place_vertical(letters, size, wordSearch)
+                        if placed:
+                            print(word + " placed vertically")
+                            wordsPlaced += 1
+                    elif r == 2:
+                        placed = place_horizontal(letters, size, wordSearch)
+                        if placed:
+                            print(word + " placed horizontally")
+                            wordsPlaced += 1
+                    elif r == 3:
+                        placed = place_diagonal(letters, size, wordSearch)
+                        if placed:
+                            print(word + " placed diagonally")
+                            wordsPlaced += 1
+
+        if wordsPlaced == len(words):
+            print("Done on attempt no:" + str(attempts))
+            return
+
+        attempts += 1
+        print("New attempt")
+
+    print("Failed to place all words after multiple attempts. Restarting...")
 
 
 def fill_grid(wordSearch):  # Fill spaces with value '0' with random characters
@@ -138,17 +156,16 @@ def fill_grid(wordSearch):  # Fill spaces with value '0' with random characters
                 row[i] = randchar
 
 
-def grid_print(wordSearch):
+def showGame(wordSearch, words):
     print("\n\nWord Search:")
     for row in wordSearch:
         elements_to_print = []
         for element in row:
-            if element == "1":
-                elements_to_print.append("\033[1;32m" + element + "\033[0m")
-            else:
-                elements_to_print.append(element)
+            elements_to_print.append(element)
         row_string = " ".join(str(element) for element in elements_to_print)
         print(row_string)
+    for word in words:
+        print(word)
 
 
 def txt_print(wordsearch, file_name):
@@ -170,6 +187,7 @@ if __name__ == '__main__':
     words = takeWords()
     placeWords(wordSearch, words)
     fill_grid(wordSearch)
-    grid_print(wordSearch)
+    showGame(wordSearch, words)
+
     file_name = input("Enter a filename:\n>>> ")
     txt_print(wordSearch, file_name)
