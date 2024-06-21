@@ -1,7 +1,7 @@
 import random
 
 
-def takeWords(size=5):
+def takeWords():
     words = []
     spacesRemaining = size * size
 
@@ -85,6 +85,7 @@ def place_vertical(letters, size, wordsearch, max_attempts=1000):
         attempts += 1
     return False
 
+
 def placeWords(wordSearch, fullWords):
     size = len(wordSearch)
     fullWords.sort(key=len, reverse=True)  # Sort words by length in descending order
@@ -157,11 +158,10 @@ def txt_print(wordsearch, file_name):
             for x in row:
                 f.write(' ' + str(x))  # Added str() to ensure x is treated as string
         f.write('\n\n')
-        f.write('WORDBANK'+'\n')
+        f.write('WORDBANK' + '\n')
         for word in words:
             f.write(word + '\n')
     print(file_name + ".txt" " created")
-
 
 
 if __name__ == '__main__':
