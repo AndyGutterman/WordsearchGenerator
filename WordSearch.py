@@ -1,4 +1,6 @@
 import random
+from WordPlacer import WordPlacer  # Import WordPlacer class from WordPlacer module
+
 
 class WordSearch:
     def __init__(self, size):
@@ -21,48 +23,6 @@ class WordSearch:
             else:
                 print("The word you've typed is too large, please choose another word")
 
-    def place_diagonal(self, letters, max_attempts=1000):
-        attempts = 0
-        while attempts < max_attempts:
-            row_num = random.randint(0, self.size - len(letters))
-            column_num = random.randint(0, self.size - len(letters))
-            can_place_word = all(self.grid[row_num + i][column_num + i] in [0, letters[i]] for i in range(len(letters)))
-
-            if can_place_word:
-                for i in range(len(letters)):
-                    self.grid[row_num + i][column_num + i] = letters[i]
-                return True
-            attempts += 1
-        return False
-
-    def place_horizontal(self, letters, max_attempts=1000):
-        attempts = 0
-        while attempts < max_attempts:
-            row_num = random.randint(0, self.size - 1)
-            column_num = random.randint(0, self.size - len(letters))
-            can_place_word = all(self.grid[row_num][column_num + i] in [0, letters[i]] for i in range(len(letters)))
-
-            if can_place_word:
-                for i in range(len(letters)):
-                    self.grid[row_num][column_num + i] = letters[i]
-                return True
-            attempts += 1
-        return False
-
-    def place_vertical(self, letters, max_attempts=1000):
-        attempts = 0
-        while attempts < max_attempts:
-            row_num = random.randint(0, self.size - len(letters))
-            column_num = random.randint(0, self.size - 1)
-            can_place_word = all(self.grid[row_num + i][column_num] in [0, letters[i]] for i in range(len(letters)))
-
-            if can_place_word:
-                for i in range(len(letters)):
-                    self.grid[row_num + i][column_num] = letters[i]
-                return True
-            attempts += 1
-        return False
-
     def place_words(self):
         self.words.sort(key=len, reverse=True)
 
@@ -72,10 +32,9 @@ class WordSearch:
             if attempts > 0:
                 self.grid = [[0] * self.size for _ in range(self.size)]
 
-            limit_words = sum(1 for word in self.words if len(word) == self.size)
-
-            if limit_words > 1:
-                print(f"There are {limit_words} words with length equal to the size of the array.")
+            # limit_words = sum(1 for word in self.words if len(word) == self.size)
+            # if limit_words > 1:                    #  Later might disallow diagonals when > 1 limitwords exist
+            #     print(f"There are {limit_words} words with length equal to the size of the array.")
 
             try:
                 for word in self.words:
@@ -84,17 +43,17 @@ class WordSearch:
                     while not placed:
                         r = random.randint(1, 3)
                         if r == 1:
-                            placed = self.place_vertical(letters)
+                            placed = WordPlacer.place_vertical(self.grid, letters, self.size)
                             if placed:
                                 print(word + " placed vertically")
                                 words_placed += 1
                         elif r == 2:
-                            placed = self.place_horizontal(letters)
+                            placed = WordPlacer.place_horizontal(self.grid, letters, self.size)
                             if placed:
                                 print(word + " placed horizontally")
                                 words_placed += 1
                         elif r == 3:
-                            placed = self.place_diagonal(letters)
+                            placed = WordPlacer.place_diagonal(self.grid, letters, self.size)
                             if placed:
                                 print(word + " placed diagonally")
                                 words_placed += 1
@@ -141,11 +100,13 @@ class WordSearch:
                 f.write(word + '\n')
         print(file_name + ".txt created")
 
+
 def customize():
     size = int(input("Enter a size for the wordSearch:\n>>> "))
     word_search = WordSearch(size)
     word_search.take_words()
     return word_search
+
 
 if __name__ == '__main__':
     word_search = customize()
