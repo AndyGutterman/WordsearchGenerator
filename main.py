@@ -1,20 +1,24 @@
 import random
 
 
-def takeWords():
+def takeWords(size=5):
     words = []
     spacesRemaining = size * size
-    while spacesRemaining > 0:  # Take word from user and add to list, stopping at done
-        word = input("Enter a word, 'done' when finished:")
+
+    while spacesRemaining > 0:
+        word = input("Enter a word, 'done' when finished: ")
         word = word.upper()  # Convert word to uppercase
-        if word == 'DONE' or spacesRemaining < 0:  # Break loop if user is done
+
+        if word == 'DONE' or spacesRemaining < 0:
             break
-        if len(word) <= size & len(word) <= spacesRemaining:  # Ensures word is small enough to fit
+
+        if len(word) <= size and len(word) <= spacesRemaining:  # Corrected the logical operator to 'and'
             words.append(word)
-            spacesRemaining = spacesRemaining - len(word)
-            print("You have " + str(spacesRemaining) + "characters left")
+            spacesRemaining -= len(word)  # Updated shorthand notation
+            print("You have " + str(spacesRemaining) + " characters left")
         else:
             print("The word you've typed is too large, please choose another word")
+
     return words
 
 
@@ -146,6 +150,20 @@ def grid_print(wordSearch):
         print(row_string)
 
 
+def txt_print(wordsearch, file_name):
+    with open(file_name + ".txt", 'w') as f:  # Corrected mode from 'W' to 'w'
+        for row in wordsearch:
+            f.write('\n')
+            for x in row:
+                f.write(' ' + str(x))  # Added str() to ensure x is treated as string
+        f.write('\n\n')
+        f.write('WORDBANK'+'\n')
+        for word in words:
+            f.write(word + '\n')
+    print(file_name + ".txt" " created")
+
+
+
 if __name__ == '__main__':
     size = int(input("Enter a size for the wordSearch:\n>>> "))
     wordSearch = [[0] * size for i in range(size)]
@@ -153,3 +171,5 @@ if __name__ == '__main__':
     placeWords(wordSearch, words)
     fill_grid(wordSearch)
     grid_print(wordSearch)
+    file_name = input("Enter a filename:\n>>> ")
+    txt_print(wordSearch, file_name)
