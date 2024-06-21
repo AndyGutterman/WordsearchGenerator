@@ -1,5 +1,5 @@
 
-def take_words():
+def take_words(size):
     words = []
     spacesRemaining = size * size
 
@@ -84,37 +84,23 @@ def place_vertical(letters, size, wordsearch, max_attempts=1000):
 
 import random
 
+
 def place_words(wordSearch, words):
     size = len(wordSearch)
     words.sort(key=len, reverse=True)  # Sort words by length in descending order
 
     attempts = 0
-    limit_words = sum(1 for word in words if len(word) == size)
-
     while attempts < 1000:
         wordsPlaced = 0
         if attempts > 0:
-            wordSearch = [[0] * size for _ in range(size)]
+            wordSearch = [[0] * size for _ in range(size)]  # Reset the word search grid
+
+        limit_words = sum(1 for word in words if len(word) == size)
 
         if limit_words > 1:
             print(f"There are {limit_words} words with length equal to the size of the array.")
-            for word in words:
-                if len(word) == size:
-                    letters = list(word)
-                    placed = False
-                    while not placed:
-                        r = random.randint(1, 2)
-                        if r == 1:
-                            placed = place_vertical(letters, size, wordSearch)
-                            if placed:
-                                print(word + " placed vertically")
-                                wordsPlaced += 1
-                        elif r == 2:
-                            placed = place_horizontal(letters, size, wordSearch)
-                            if placed:
-                                print(word + " placed horizontally")
-                                wordsPlaced += 1
-        else:
+
+        try:
             for word in words:
                 letters = list(word)
                 placed = False
@@ -136,9 +122,15 @@ def place_words(wordSearch, words):
                             print(word + " placed diagonally")
                             wordsPlaced += 1
 
-        if wordsPlaced == len(words):
-            print("Done on attempt no:" + str(attempts))
-            return
+                    if placed:
+                        break  # Exit loop if word is successfully placed
+
+            if wordsPlaced == len(words):
+                print("Done on attempt no:" + str(attempts))
+                return
+
+        except Exception as e:
+            print(f"Error occurred during word placement: {e}")
 
         attempts += 1
         print("New attempt")
@@ -166,26 +158,32 @@ def show_game(wordSearch, words):
         print(word)
 
 
-def txt_print(wordsearch, file_name):
-    with open(file_name + ".txt", 'w') as f:  # Corrected mode from 'W' to 'w'
+def txt_print(wordsearch):
+    file_name = input("Enter a filename:\n>>> ")
+    with open(file_name + ".txt", 'w') as f:
         for row in wordsearch:
             f.write('\n')
             for x in row:
-                f.write(' ' + str(x))  # Added str() to ensure x is treated as string
+                f.write(' ' + str(x))
         f.write('\n\n')
         f.write('WORDBANK' + '\n')
         for word in words:
             f.write(word + '\n')
     print(file_name + ".txt" " created")
 
-
-if __name__ == '__main__':
+def customize():
     size = int(input("Enter a size for the wordSearch:\n>>> "))
-    wordSearch = [[0] * size for i in range(size)]
-    words = take_words()
+    words = take_words(size)
+    return words, size
+
+def createGrid(words, size):
+    wordSearch = [[0] * size for _ in range(size)]
     place_words(wordSearch, words)
     fill_grid(wordSearch)
-    show_game(wordSearch, words)
+    return wordSearch
 
-    file_name = input("Enter a filename:\n>>> ")
-    txt_print(wordSearch, file_name)
+if __name__ == '__main__':
+    words, size = customize()
+    wordSearch = createGrid(words, size)
+    show_game(wordSearch, words)
+    txt_print(wordSearch)
