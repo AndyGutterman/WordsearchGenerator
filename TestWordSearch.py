@@ -11,38 +11,18 @@ class TestWordSearch(WordSearch):
 
 
 
-def run_test():
-    size = 10
-    predefined_words = ["PYTHON", "JAVA", "RUBY", "CPLUSPLUS", "SWIFT", "JAVASCRIPT"]
+def run_test(size, predefined_words):
     test_word_search = TestWordSearch(size, predefined_words)
     test_word_search.place_words()
     test_word_search.fill_grid()
     test_word_search.show_game()
-    # test_word_search.txt_print()
-
-def run_test1():
-    size = 5
-    predefined_words = ["DOGGY", "FOGGY", "LOG", "COG", "DOG", "POG"]
-    test_word_search = TestWordSearch(size, predefined_words)
-    test_word_search.place_words()
-    test_word_search.fill_grid()
-    test_word_search.show_game()
-
-def run_test2():
-    size = 5
-    predefined_words = ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"]
-    test_word_search = TestWordSearch(size, predefined_words)
-    test_word_search.place_words()
-    test_word_search.fill_grid()
-    test_word_search.show_game()
-
 
 if __name__ == '__main__':
-    run_test()
-    run_test()
-    run_test()
-    run_test1()
-    run_test1()
-    run_test1()
-    run_test2()
-    run_test2()
+    tests = [
+        (10, ["PYTHON", "JAVA", "RUBY", "CPLUSPLUS", "SWIFT", "JAVASCRIPT"]),
+        (5, ["DOGGY", "FOGGY", "LOG", "COG", "DOG", "POG"]),
+        (5, ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"])
+    ]
+
+    for size, words in tests:
+        run_test(size, words)
