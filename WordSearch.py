@@ -1,5 +1,5 @@
 import random
-from WordPlacer import WordPlacer  # Import WordPlacer class from WordPlacer module
+from WordPlacer import WordPlacer
 
 
 class WordSearch:
@@ -32,16 +32,20 @@ class WordSearch:
             if attempts > 0:
                 self.grid = [[0] * self.size for _ in range(self.size)]
 
-            # limit_words = sum(1 for word in self.words if len(word) == self.size)
-            # if limit_words > 1:                    #  Later might disallow diagonals when > 1 limitwords exist
-            #     print(f"There are {limit_words} words with length equal to the size of the array.")
-
+            limit_r = random.randint(1, 2)
+            limit_words = sum(1 for word in self.words if len(word) == self.size)
+            if limit_words > 1:
+                print(f"There are {limit_words} words with length equal to the size of the array.")
             try:
                 for word in self.words:
                     letters = list(word)
                     placed = False
                     while not placed:
-                        r = random.randint(1, 3)
+                        if (limit_words > 1):
+                            r = limit_r
+                            limit_words -= 1
+                        else:
+                            r = random.randint(1, 3)
                         if r == 1:
                             placed = WordPlacer.place_vertical(self.grid, letters, self.size)
                             if placed:
@@ -57,7 +61,6 @@ class WordSearch:
                             if placed:
                                 print(word + " placed diagonally")
                                 words_placed += 1
-
                         if placed:
                             break
 

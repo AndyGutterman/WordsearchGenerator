@@ -22,7 +22,6 @@ class WordPlacer:
             row_num = random.randint(0, size - 1)
             column_num = random.randint(0, size - len(letters))
             can_place_word = all(grid[row_num][column_num + i] in [0, letters[i]] for i in range(len(letters)))
-
             if can_place_word:
                 for i in range(len(letters)):
                     grid[row_num][column_num + i] = letters[i]
