@@ -10,12 +10,13 @@ class TestWordSearch(WordSearch):
         self.words = predefined_words
 
 
-
 def run_test(size, predefined_words):
     test_word_search = TestWordSearch(size, predefined_words)
     test_word_search.place_words()
     test_word_search.fill_grid()
-    test_word_search.show_game()
+    test_word_search.show_grid()
+    # test_word_search.show_wordbank()
+    test_word_search.print_word_locations()
 
 if __name__ == '__main__':
     tests = [

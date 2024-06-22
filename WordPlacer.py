@@ -1,6 +1,5 @@
 import random
 
-
 class WordPlacer:
     @staticmethod
     def place_diagonal(word_search, letters, max_attempts=1000):
@@ -16,6 +15,9 @@ class WordPlacer:
             if can_place_word:
                 for i in range(len(letters)):
                     grid[row_num + i][column_num + i] = letters[i]
+                start = (row_num, column_num)
+                direction = "diagonal"
+                word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
                 return True
             attempts += 1
         return False
@@ -33,6 +35,9 @@ class WordPlacer:
             if can_place_word:
                 for i in range(len(letters)):
                     grid[row_num][column_num + i] = letters[i]
+                start = (row_num, column_num)
+                direction = "horizontal"
+                word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
                 return True
             attempts += 1
         return False
@@ -51,6 +56,9 @@ class WordPlacer:
             if can_place_word:
                 for i in range(len(letters)):
                     grid[row_num + i][column_num] = letters[i]
+                start = (row_num, column_num)
+                direction = "vertical"
+                word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
                 return True
             attempts += 1
         return False

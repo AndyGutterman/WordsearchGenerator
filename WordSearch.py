@@ -29,41 +29,26 @@ class WordSearch:
         attempts = 0
         while attempts < 1000:
             words_placed = 0
-            if attempts > 0:
-                self.grid = [[0] * self.size for _ in range(self.size)]
-
-            limit_r = random.randint(1, 2)
-            limit_words = sum(1 for word in self.words if len(word) == self.size)
-            if limit_words > 1:
-                print(f"There are {limit_words} words with length equal to the size of the array.")
+            current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
 
             try:
                 for word in self.words:
+                    if word in self.word_locations:  # Skip already placed words
+                        continue
                     letters = list(word)
                     placed = False
                     while not placed:
-                        if (limit_words > 1):
-                            r = limit_r
-                            limit_words -= 1
-                        else:
-                            r = random.randint(1, 3)
+                        r = random.randint(1, 3)
                         if r == 1:
                             placed = WordPlacer.place_vertical(self, letters)
-                            if placed:
-                                print(word + " placed vertically")
-                                words_placed += 1
                         elif r == 2:
                             placed = WordPlacer.place_horizontal(self, letters)
-                            if placed:
-                                print(word + " placed horizontally")
-                                words_placed += 1
                         elif r == 3:
                             placed = WordPlacer.place_diagonal(self, letters)
-                            if placed:
-                                print(word + " placed diagonally")
-                                words_placed += 1
-                        if placed:
-                            break
+
+                    if placed:
+                        words_placed += 1
+                        self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
 
                 if words_placed == len(self.words):
                     print("Done on attempt no:", attempts)
@@ -71,6 +56,8 @@ class WordSearch:
 
             except Exception as e:
                 print(f"Error occurred during word placement: {e}")
+                self.grid = current_grid_state  # Revert to previous grid state
+                attempts += 1
 
             attempts += 1
             print("New attempt")
@@ -84,13 +71,14 @@ class WordSearch:
                     randchar = chr(random.randint(65, 90))
                     row[i] = randchar
 
-    def show_game(self):
+
+    def show_grid(self):
         print("\n\nWord Search:")
         for row in self.grid:
             print(" ".join(str(element) for element in row))
+    def show_wordbank(self):
         for word in self.words:
             print(word)
-
     def txt_print(self):
         file_name = input("Enter a filename:\n>>> ")
         with open(file_name + ".txt", 'w') as f:
@@ -104,6 +92,18 @@ class WordSearch:
                 f.write(word + '\n')
         print(file_name + ".txt created")
 
+    def print_word_locations(self):
+        printed_words = set()  # To keep track of words already printed
+        for word in self.words:
+            if tuple(word) in self.word_locations and word not in printed_words:
+                placements = self.word_locations[tuple(word)]
+                for start, direction in placements:
+                    print(f"{word}: Row/Col {start}, Direction {direction}")
+                printed_words.add(word)  # Add word to printed set
+            elif word not in printed_words:
+                print(f"{word}: Not placed")
+                printed_words.add(word)  # Add word to printed set
+
 
 def customize():
     size = int(input("Enter a size for the wordSearch:\n>>> "))
@@ -116,5 +116,6 @@ if __name__ == '__main__':
     word_search = customize()
     word_search.place_words()
     word_search.fill_grid()
-    word_search.show_game()
+    word_search.show_grid()
+    word_search.show_wordbank()
     word_search.txt_print()
