@@ -1,5 +1,8 @@
 from WordSearch import WordSearch
-
+# todo track word location
+# todo use word location to make sure words dont get
+#  put on top of each other as you will see in runtest3
+# todo system to keep track of found words
 
 class TestWordSearch(WordSearch):
     def __init__(self, size, predefined_words):
@@ -25,16 +28,21 @@ def run_test1():
     test_word_search.fill_grid()
     test_word_search.show_game()
 
+def run_test2():
+    size = 5
+    predefined_words = ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"]
+    test_word_search = TestWordSearch(size, predefined_words)
+    test_word_search.place_words()
+    test_word_search.fill_grid()
+    test_word_search.show_game()
 
 
 if __name__ == '__main__':
     run_test()
     run_test()
     run_test()
-    run_test()
-    run_test()
     run_test1()
     run_test1()
     run_test1()
-    run_test1()
-    run_test1()
+    run_test2()
+    run_test2()
