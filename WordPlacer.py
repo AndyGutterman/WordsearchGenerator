@@ -2,7 +2,11 @@ import random
 
 
 class WordPlacer:
-    def place_diagonal(grid, letters, size, max_attempts=1000):
+    @staticmethod
+    def place_diagonal(word_search, letters, max_attempts=1000):
+        grid = word_search.grid
+        size = word_search.size
+
         attempts = 0
         while attempts < max_attempts:
             row_num = random.randint(0, size - len(letters))
@@ -16,7 +20,11 @@ class WordPlacer:
             attempts += 1
         return False
 
-    def place_horizontal(grid, letters, size, max_attempts=1000):
+    @staticmethod
+    def place_horizontal(word_search, letters, max_attempts=1000):
+        grid = word_search.grid
+        size = word_search.size
+
         attempts = 0
         while attempts < max_attempts:
             row_num = random.randint(0, size - 1)
@@ -29,7 +37,11 @@ class WordPlacer:
             attempts += 1
         return False
 
-    def place_vertical(grid, letters, size, max_attempts=1000):
+    @staticmethod
+    def place_vertical(word_search, letters, max_attempts=1000):
+        grid = word_search.grid
+        size = word_search.size
+
         attempts = 0
         while attempts < max_attempts:
             row_num = random.randint(0, size - len(letters))

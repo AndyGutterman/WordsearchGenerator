@@ -1,12 +1,12 @@
 import random
-from WordPlacer import WordPlacer
-
+from WordPlacer import WordPlacer  # Assuming WordPlacer is in a separate module
 
 class WordSearch:
     def __init__(self, size):
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
+        self.word_locations = {}
 
     def take_words(self):
         spaces_remaining = self.size * self.size
@@ -36,6 +36,7 @@ class WordSearch:
             limit_words = sum(1 for word in self.words if len(word) == self.size)
             if limit_words > 1:
                 print(f"There are {limit_words} words with length equal to the size of the array.")
+
             try:
                 for word in self.words:
                     letters = list(word)
@@ -47,17 +48,17 @@ class WordSearch:
                         else:
                             r = random.randint(1, 3)
                         if r == 1:
-                            placed = WordPlacer.place_vertical(self.grid, letters, self.size)
+                            placed = WordPlacer.place_vertical(self, letters)
                             if placed:
                                 print(word + " placed vertically")
                                 words_placed += 1
                         elif r == 2:
-                            placed = WordPlacer.place_horizontal(self.grid, letters, self.size)
+                            placed = WordPlacer.place_horizontal(self, letters)
                             if placed:
                                 print(word + " placed horizontally")
                                 words_placed += 1
                         elif r == 3:
-                            placed = WordPlacer.place_diagonal(self.grid, letters, self.size)
+                            placed = WordPlacer.place_diagonal(self, letters)
                             if placed:
                                 print(word + " placed diagonally")
                                 words_placed += 1
