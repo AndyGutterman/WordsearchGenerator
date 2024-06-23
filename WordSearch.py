@@ -7,6 +7,7 @@ class WordSearch:
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
         self.word_locations = {}
+        self.occupied_positions = set()
 
     def take_words(self):
         spaces_remaining = self.size * self.size
@@ -25,7 +26,7 @@ class WordSearch:
         self.words.sort(key=len, reverse=True)
         big_words_count = sum(1 for word in self.words if len(word) == self.size)
         print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
-        r_big = random.randint(1, 2);
+        r_big = random.randint(1, 2)
         attempts = 0
         while attempts < 1:
             words_placed = 0
@@ -33,14 +34,15 @@ class WordSearch:
             current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
             try:
                 for word in self.words:
-                    if word in self.word_locations:  # Skip already placed words
+                    if word in self.word_locations:
                         continue
                     letters = list(word)
                     placed = False
                     while not placed:
                         if (big_words_count >= 1):
-                            r = r_big;
-                        r = random.randint(1, 3)
+                            r = r_big
+                        else:
+                            r = random.randint(1, 3)
                         if r == 1:
                             placed = WordPlacer.place_vertical(self, letters)
                         elif r == 2:
@@ -50,7 +52,7 @@ class WordSearch:
 
                     if placed:
                         words_placed += 1
-                        big_words_count -= 1;
+                        big_words_count -= 1
                         self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
 
                 if words_placed == len(self.words):
@@ -108,7 +110,6 @@ class WordSearch:
                 print(f"{word}: Not placed")
                 printed_words.add(word)  # Add word to printed set
 
-
 def customize():
     size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
     if size == 0:
@@ -116,7 +117,6 @@ def customize():
     word_search = WordSearch(size)
     word_search.take_words()
     return word_search
-
 
 if __name__ == '__main__':
     word_search = customize()

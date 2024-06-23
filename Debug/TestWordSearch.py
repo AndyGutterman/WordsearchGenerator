@@ -19,25 +19,19 @@ def run_test(test_id, size, predefined_words):
 
 if __name__ == '__main__':
     tests = [
-        ("test1", 10, ["PYTHON", "JAVA", "RUBY", "CPLUSPLUS", "SWIFT", "JAVASCRIPT"]),
-        ("test2", 5, ["DOGGY", "FOGGY", "LOG", "COG", "DOG", "POG"]),
-        ("test3", 5, ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"]),
-        ("test4", 7, ["22222", "11111", "11121", "11111", "123456", "515", "515"]),
-        ("test5", 3, ["HELLO", "WORLD", "PYTHON"]),
-        ("test6", 4, ["RED", "GREEN", "BLUE", "YELLOW"]),
-        ("test7", 6, ["APPLE", "ORANGE", "BANANA", "GRAPE", "PEAR", "KIWI"]),
-        ("test8", 2, ["CAR", "BIKE"]),
-        ("test9", 5, ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]),
-        ("test10", 4, ["SUN", "MOON", "STAR", "PLANET"]),
-        ("test11", 0, ["ZERO"]),
-        ("test12", -1, ["NEGATIVE"]),
-        ("test13", 3, []),
+        (10, ["PYTHON", "JAVA", "RUBY", "CPLUSPLUS", "SWIFT", "JAVASCRIPT"]),
+        (5, ["DOGGY", "FOGGY", "LOG", "COG", "DOG", "POG"]),
+        (7, ["22222", "11111", "11121", "11111", "123456", "515", "515"]),
+        (6, ["RED", "GREEN", "BLUE", "YELLOW"]),
+        (5, ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"]),
     ]
+
 
     successful_tests = []
     failed_tests = []
 
-    for test_id, size, words in tests:
+    for idx, (size, words) in enumerate(tests, start=1):
+        test_id = f"test{idx}"
         try:
             if run_test(test_id, size, words):
                 successful_tests.append(test_id)

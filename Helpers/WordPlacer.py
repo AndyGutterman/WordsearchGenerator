@@ -1,5 +1,6 @@
 import random
 
+
 class WordPlacer:
     @staticmethod
     def place_diagonal(word_search, letters, max_attempts=1000):
@@ -10,15 +11,15 @@ class WordPlacer:
         while attempts < max_attempts:
             row_num = random.randint(0, size - len(letters))
             column_num = random.randint(0, size - len(letters))
-            can_place_word = all(grid[row_num + i][column_num + i] in [0, letters[i]] for i in range(len(letters)))
 
-            if can_place_word:
+            if WordPlacer.can_place_diagonal(grid, row_num, column_num, letters):
                 for i in range(len(letters)):
                     grid[row_num + i][column_num + i] = letters[i]
                 start = (row_num, column_num)
                 direction = "diagonal"
-                word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
-                return True
+                if not WordPlacer.check_existing_placement(word_search, letters, start, direction):
+                    word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
+                    return True
             attempts += 1
         return False
 
@@ -31,14 +32,15 @@ class WordPlacer:
         while attempts < max_attempts:
             row_num = random.randint(0, size - 1)
             column_num = random.randint(0, size - len(letters))
-            can_place_word = all(grid[row_num][column_num + i] in [0, letters[i]] for i in range(len(letters)))
-            if can_place_word:
+
+            if WordPlacer.can_place_horizontal(grid, row_num, column_num, letters):
                 for i in range(len(letters)):
                     grid[row_num][column_num + i] = letters[i]
                 start = (row_num, column_num)
                 direction = "horizontal"
-                word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
-                return True
+                if not WordPlacer.check_existing_placement(word_search, letters, start, direction):
+                    word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
+                    return True
             attempts += 1
         return False
 
@@ -51,14 +53,47 @@ class WordPlacer:
         while attempts < max_attempts:
             row_num = random.randint(0, size - len(letters))
             column_num = random.randint(0, size - 1)
-            can_place_word = all(grid[row_num + i][column_num] in [0, letters[i]] for i in range(len(letters)))
 
-            if can_place_word:
+            if WordPlacer.can_place_vertical(grid, row_num, column_num, letters):
                 for i in range(len(letters)):
                     grid[row_num + i][column_num] = letters[i]
                 start = (row_num, column_num)
                 direction = "vertical"
-                word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
-                return True
+                if not WordPlacer.check_existing_placement(word_search, letters, start, direction):
+                    word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
+                    return True
             attempts += 1
+        return False
+
+    @staticmethod
+    def can_place_diagonal(grid, row_num, column_num, letters):
+        size = len(letters)
+        if row_num + size > len(grid) or column_num + size > len(grid):
+            return False
+
+        return all(grid[row_num + i][column_num + i] in [0, letters[i]] for i in range(size))
+
+    @staticmethod
+    def can_place_horizontal(grid, row_num, column_num, letters):
+        size = len(letters)
+        if column_num + size > len(grid[row_num]):
+            return False
+
+        return all(grid[row_num][column_num + i] in [0, letters[i]] for i in range(size))
+
+    @staticmethod
+    def can_place_vertical(grid, row_num, column_num, letters):
+        size = len(letters)
+        if row_num + size > len(grid):
+            return False
+
+        return all(grid[row_num + i][column_num] in [0, letters[i]] for i in range(size))
+
+    @staticmethod
+    def check_existing_placement(word_search, letters, start, direction):
+        if tuple(letters) in word_search.word_locations:
+            placements = word_search.word_locations[tuple(letters)]
+            for (existing_start, existing_direction) in placements:
+                if existing_start == start and existing_direction == direction:
+                    return True
         return False
