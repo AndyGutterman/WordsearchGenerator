@@ -5,7 +5,6 @@ class TestWordSearch(WordSearch):
         super().__init__(size)
         self.words = predefined_words
 
-
 def run_test(test_id, size, predefined_words):
     test_word_search = TestWordSearch(size, predefined_words)
     try:
@@ -13,8 +12,10 @@ def run_test(test_id, size, predefined_words):
         test_word_search.fill_grid()
         test_word_search.show_grid()
         test_word_search.print_word_locations()
+        return True     # Test successful
     except Exception as e:
         print(f"Test {test_id} failed with error: {e}")
+        return False    # Test errored
 
 if __name__ == '__main__':
     tests = [
@@ -35,8 +36,19 @@ if __name__ == '__main__':
         ("test15", 4, ["VALID", "LIST", "WITH", 12345])
     ]
 
+    successful_tests = []
+    failed_tests = []
+
     for test_id, size, words in tests:
         try:
-            run_test(test_id, size, words)
+            if run_test(test_id, size, words):
+                successful_tests.append(test_id)
+            else:
+                failed_tests.append(test_id)
         except Exception as e:
-            print(f"Test {test_id} failed with error: {e}")
+            print(f"Test {test_id} failed with exception: {e}")
+            failed_tests.append(test_id)
+
+    print("\nSummary:")
+    print(f"Successful Tests: {successful_tests}")
+    print(f"Failed Tests: {failed_tests}")
