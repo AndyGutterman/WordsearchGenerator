@@ -1,5 +1,5 @@
 import random
-from WordPlacer import WordPlacer  # Assuming WordPlacer is in a separate module
+from WordPlacer import WordPlacer
 
 class WordSearch:
     def __init__(self, size):
@@ -27,10 +27,10 @@ class WordSearch:
         self.words.sort(key=len, reverse=True)
 
         attempts = 0
-        while attempts < 1000:
+        while attempts < 1:
             words_placed = 0
-            current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
 
+            current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
             try:
                 for word in self.words:
                     if word in self.word_locations:  # Skip already placed words
@@ -106,7 +106,9 @@ class WordSearch:
 
 
 def customize():
-    size = int(input("Enter a size for the wordSearch:\n>>> "))
+    size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
+    if (size == 0):
+        return WordSearch(1);
     word_search = WordSearch(size)
     word_search.take_words()
     return word_search
