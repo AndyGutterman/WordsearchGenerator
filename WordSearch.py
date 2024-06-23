@@ -13,7 +13,6 @@ class WordSearch:
 
         while spaces_remaining > 0:
             word = input("Enter a word, 'done' when finished: ").upper()
-
             if word == 'DONE' or spaces_remaining < 0:
                 break
             if len(word) <= self.size and len(word) <= spaces_remaining:
@@ -25,7 +24,9 @@ class WordSearch:
 
     def place_words(self):
         self.words.sort(key=len, reverse=True)
-
+        big_words_count = sum(1 for word in self.words if len(word) == self.size)
+        print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
+        r_big = random.randint(1, 2);
         attempts = 0
         while attempts < 1:
             words_placed = 0
@@ -38,6 +39,8 @@ class WordSearch:
                     letters = list(word)
                     placed = False
                     while not placed:
+                        if (big_words_count >= 1):
+                            r = r_big;
                         r = random.randint(1, 3)
                         if r == 1:
                             placed = WordPlacer.place_vertical(self, letters)
@@ -48,6 +51,7 @@ class WordSearch:
 
                     if placed:
                         words_placed += 1
+                        big_words_count -= 1;
                         self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
 
                 if words_placed == len(self.words):
@@ -71,14 +75,15 @@ class WordSearch:
                     randchar = chr(random.randint(65, 90))
                     row[i] = randchar
 
-
     def show_grid(self):
         print("\n\nWord Search:")
         for row in self.grid:
             print(" ".join(str(element) for element in row))
+
     def show_wordbank(self):
         for word in self.words:
             print(word)
+
     def txt_print(self):
         file_name = input("Enter a filename:\n>>> ")
         with open(file_name + ".txt", 'w') as f:
@@ -90,7 +95,7 @@ class WordSearch:
             f.write('WORDBANK' + '\n')
             for word in self.words:
                 f.write(word + '\n')
-        print(file_name + ".txt created")
+        print(f"{file_name}.txt created")
 
     def print_word_locations(self):
         printed_words = set()  # To keep track of words already printed
@@ -107,8 +112,8 @@ class WordSearch:
 
 def customize():
     size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
-    if (size == 0):
-        return WordSearch(1);
+    if size == 0:
+        return WordSearch(size)
     word_search = WordSearch(size)
     word_search.take_words()
     return word_search
