@@ -1,5 +1,5 @@
 import random
-from WordPlacer import WordPlacer
+from Helpers.WordPlacer import WordPlacer
 
 class WordSearch:
     def __init__(self, size):
