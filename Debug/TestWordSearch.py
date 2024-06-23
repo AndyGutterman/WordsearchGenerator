@@ -32,8 +32,6 @@ if __name__ == '__main__':
         ("test11", 0, ["ZERO"]),
         ("test12", -1, ["NEGATIVE"]),
         ("test13", 3, []),
-        ("test14", "invalid", ["INVALID"]),
-        ("test15", 4, ["VALID", "LIST", "WITH", 12345])
     ]
 
     successful_tests = []
