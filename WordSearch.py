@@ -10,7 +10,6 @@ class WordSearch:
 
     def take_words(self):
         spaces_remaining = self.size * self.size
-
         while spaces_remaining > 0:
             word = input("Enter a word, 'done' when finished: ").upper()
             if word == 'DONE' or spaces_remaining < 0:
