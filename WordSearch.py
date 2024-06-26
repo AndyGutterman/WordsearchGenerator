@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
-from Helpers.WordPlacer import WordPlacer
 import random
+from Helpers.WordPlacer import WordPlacer  # Assuming you have a WordPlacer module
 
 class WordSearch:
     def __init__(self, size):
@@ -38,7 +38,7 @@ class WordSearch:
             if len(word) <= self.size and len(word) <= spaces_remaining:
                 self.words.append(word)
                 spaces_remaining -= len(word)
-                gui_instance.output_text.insert(tk.END, f"Entered word: {word}. {spaces_remaining} characters left\n")
+                gui_instance.output_text.insert(tk.END, f"Entered word: {word}. {spaces_remaining} spaces left\n")
                 gui_instance.output_text.see(tk.END)  # Scroll to the end of text widget
                 word_entry.delete(0, tk.END)  # Clear the entry widget here
             else:
@@ -58,6 +58,8 @@ class WordSearch:
 
         word_input = tk.StringVar()
         word_entry.config(textvariable=word_input)
+
+        gui_instance.output_text.insert(tk.END, f"Spaces remaining: {spaces_remaining}, Max word length: {self.size}\n")
 
     def generate_words(self, spaces_remaining):
         current_density = (self.size * self.size - spaces_remaining) / (self.size * self.size)
@@ -191,6 +193,12 @@ class WordSearchGUI(tk.Tk):
 
             word_search = WordSearch(size)
             word_search.take_words_gui(self)
+
+            # Clear previous output and show current settings
+            self.output_text.delete(1.0, tk.END)
+            self.output_text.insert(tk.END, f"Type a word in the box below:\n")
+            self.output_text.insert(tk.END, f"Spaces remaining: {size * size}\n")
+            self.output_text.insert(tk.END, f"Max word length: {size}\n")
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
