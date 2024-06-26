@@ -53,7 +53,9 @@ class WordSearch:
     def generate_word(self, length):
         with open('wordlist.txt', 'r') as f:
             all_words = f.read().splitlines()
-            return random.choice([word.upper() for word in all_words if len(word) == length])
+            cleaned_words = [word.replace('-', '').replace("'", '').upper() for word in all_words]
+            filtered_words = [word for word in cleaned_words if len(word) == length]
+            return random.choice(filtered_words) if filtered_words else None
 
     def place_words(self):
         self.words.sort(key=len, reverse=True)
