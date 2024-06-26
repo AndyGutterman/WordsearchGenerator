@@ -36,11 +36,11 @@ class WordSearch:
         if spaces_to_generate <= 0:
             return
 
-        min_word_size = 2 if self.size > 2 else 1
+        min_word_size = 3 if self.size > 3 else 1
 
         while spaces_to_generate > 0:
             if spaces_to_generate < min_word_size:
-                break  # Exit  if remaining spaces are less than the minimum word size
+                break
 
             word_length = random.randint(min_word_size, min(self.size, spaces_to_generate, 22))
             word = self.generate_word(word_length)
