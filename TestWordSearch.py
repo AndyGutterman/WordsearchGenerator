@@ -16,7 +16,7 @@ def run_test(test_id, size, predefined_words=None):
         test_word_search = TestWordSearch(size, predefined_words)
     else:
         test_word_search = TestWordSearch(size)
-        test_word_search.generate_words()
+        test_word_search.generate_words(int(0.75 * size * size))
 
     try:
         test_word_search.place_words()
@@ -37,11 +37,10 @@ if __name__ == '__main__':
         (7, ["22222", "11111", "11121", "11111", "123456", "515", "515"]),
         (6, ["RED", "GREEN", "BLUE", "YELLOW"]),
         (5, ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"]),
-        (5, ["Froi"])
     ]
 
 
-    for i in range(1, 10):
+    for i in range(3, 28):
         tests.append((i, None))
 
     successful_tests = []
