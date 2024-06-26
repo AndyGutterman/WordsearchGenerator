@@ -2,6 +2,12 @@ import os
 import random
 from Helpers.WordPlacer import WordPlacer
 
+with open('wordlist.txt', 'r') as f:
+    all_words = f.read().splitlines()
+    all_words.sort(key=len, reverse=True)  # Sort by length in descending order
+    print(all_words)
+
+
 class WordSearch:
     def __init__(self, size):
         self.size = size
@@ -12,7 +18,6 @@ class WordSearch:
 
     def take_words(self):
         spaces_remaining = self.size * self.size
-        desired_density = self.size * 0.33
 
         while spaces_remaining > 0:
             word = input("Enter a word, 'done' if finished, 'auto' to auto-generate remaining:").strip().upper()
@@ -31,7 +36,7 @@ class WordSearch:
 
     def generate_words(self, spaces_remaining):
         current_density = (self.size * self.size - spaces_remaining) / (self.size * self.size)
-        desired_density = 0.33
+        desired_density = 0.75
         spaces_to_generate = int((desired_density - current_density) * self.size * self.size)
 
         if spaces_to_generate <= 0:
@@ -40,10 +45,16 @@ class WordSearch:
         min_word_size = 2 if self.size > 2 else 1
 
         while spaces_to_generate > 0:
-            word_length = random.randint(min_word_size, min(self.size, spaces_to_generate))
+            if spaces_to_generate < min_word_size:
+                break  # Exit  if remaining spaces are less than the minimum word size
+
+            word_length = random.randint(min_word_size, min(self.size, spaces_to_generate, 22))
             word = self.generate_word(word_length)
             self.words.append(word)
             spaces_to_generate -= len(word)
+
+            if spaces_remaining <= 0:
+                break
 
     def generate_word(self, length):
         with open('wordlist.txt', 'r') as f:
@@ -132,11 +143,15 @@ class WordSearch:
             if tuple(word) in self.word_locations and word not in printed_words:
                 placements = self.word_locations[tuple(word)]
                 for start, direction in placements:
-                    print(f"{word}: Row/Col {start}, Direction {direction}")
+                    try:
+                        print(f"{word}: Row/Col {start}, Direction {direction}")
+                    except IndexError as e:
+                        print(f"Error printing {word}: {e}")
                 printed_words.add(word)
             elif word not in printed_words:
                 print(f"{word}: Not placed")
                 printed_words.add(word)
+
 
 def customize():
     size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
