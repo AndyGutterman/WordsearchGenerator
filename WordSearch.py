@@ -62,47 +62,33 @@ class WordSearch:
         big_words_count = sum(1 for word in self.words if len(word) == self.size)
         print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
         r_big = random.randint(1, 2)
-        attempts = 0
-        while attempts < 1:
-            words_placed = 0
+        current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
+        try:
+            for word in self.words:
+                if word in self.word_locations:
+                    continue
+                letters = list(word)
+                placed = False
+                while not placed:
+                    if (big_words_count >= 1):
+                        r = r_big
+                    else:
+                        r = random.randint(1, 3)
+                    if r == 1:
+                        placed = WordPlacer.place_vertical(self, letters)
+                    elif r == 2:
+                        placed = WordPlacer.place_horizontal(self, letters)
+                    elif r == 3:
+                        placed = WordPlacer.place_diagonal(self, letters)
 
-            current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
-            try:
-                for word in self.words:
-                    if word in self.word_locations:
-                        continue
-                    letters = list(word)
-                    placed = False
-                    while not placed:
-                        if (big_words_count >= 1):
-                            r = r_big
-                        else:
-                            r = random.randint(1, 3)
-                        if r == 1:
-                            placed = WordPlacer.place_vertical(self, letters)
-                        elif r == 2:
-                            placed = WordPlacer.place_horizontal(self, letters)
-                        elif r == 3:
-                            placed = WordPlacer.place_diagonal(self, letters)
+                if placed:
+                    big_words_count -= 1
+                    self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
 
-                    if placed:
-                        words_placed += 1
-                        big_words_count -= 1
-                        self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
 
-                if words_placed == len(self.words):
-                    print("Done on attempt no:", attempts)
-                    return
-
-            except Exception as e:
-                print(f"Error occurred during word placement: {e}")
-                self.grid = current_grid_state  # Revert to previous grid state
-                attempts += 1
-
-            attempts += 1
-            print("New attempt")
-
-        print("Failed to place all words after multiple attempts. Restarting...")
+        except Exception as e:
+            print(f"Error occurred during word placement: {e}")
+            self.grid = current_grid_state  # Revert to previous grid state
 
     def fill_grid(self):
         for row in self.grid:
