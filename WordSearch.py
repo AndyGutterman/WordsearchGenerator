@@ -1,3 +1,4 @@
+import os
 import random
 from Helpers.WordPlacer import WordPlacer
 
@@ -11,16 +12,43 @@ class WordSearch:
 
     def take_words(self):
         spaces_remaining = self.size * self.size
+        desired_density = self.size * 0.33
+
         while spaces_remaining > 0:
-            word = input("Enter a word, 'done' when finished: ").upper()
-            if word == 'DONE' or spaces_remaining < 0:
+            word = input("Enter a word, 'done' if finished, 'auto' to auto-generate remaining:").strip().upper()
+            if word == 'DONE' or spaces_remaining <= 0:
                 break
+            if word == 'AUTO':
+                self.generate_words(spaces_remaining)
+                break
+
             if len(word) <= self.size and len(word) <= spaces_remaining:
                 self.words.append(word)
                 spaces_remaining -= len(word)
                 print(f"You have {spaces_remaining} characters left")
             else:
                 print("The word you've typed is too large, please choose another word")
+
+    def generate_words(self, spaces_remaining):
+        current_density = (self.size * self.size - spaces_remaining) / (self.size * self.size)
+        desired_density = 0.33
+        spaces_to_generate = int((desired_density - current_density) * self.size * self.size)
+
+        if spaces_to_generate <= 0:
+            return
+
+        min_word_size = 2 if self.size > 2 else 1
+
+        while spaces_to_generate > 0:
+            word_length = random.randint(min_word_size, min(self.size, spaces_to_generate))
+            word = self.generate_word(word_length)
+            self.words.append(word)
+            spaces_to_generate -= len(word)
+
+    def generate_word(self, length):
+        with open('wordlist.txt', 'r') as f:
+            all_words = f.read().splitlines()
+            return random.choice([word.upper() for word in all_words if len(word) == length])
 
     def place_words(self):
         self.words.sort(key=len, reverse=True)
@@ -99,16 +127,16 @@ class WordSearch:
         print(f"{file_name}.txt created")
 
     def print_word_locations(self):
-        printed_words = set()  # To keep track of words already printed
+        printed_words = set()
         for word in self.words:
             if tuple(word) in self.word_locations and word not in printed_words:
                 placements = self.word_locations[tuple(word)]
                 for start, direction in placements:
                     print(f"{word}: Row/Col {start}, Direction {direction}")
-                printed_words.add(word)  # Add word to printed set
+                printed_words.add(word)
             elif word not in printed_words:
                 print(f"{word}: Not placed")
-                printed_words.add(word)  # Add word to printed set
+                printed_words.add(word)
 
 def customize():
     size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
