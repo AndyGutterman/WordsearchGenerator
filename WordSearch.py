@@ -2,12 +2,6 @@ import os
 import random
 from Helpers.WordPlacer import WordPlacer
 
-with open('wordlist.txt', 'r') as f:
-    all_words = f.read().splitlines()
-    all_words.sort(key=len, reverse=True)  # Sort by length in descending order
-    print(all_words)
-
-
 class WordSearch:
     def __init__(self, size):
         self.size = size
