@@ -178,7 +178,7 @@ class WordSearchGUI(tk.Tk):
         self.size_entry = tk.Entry(self)
         self.size_entry.pack()
 
-        self.generate_button = tk.Button(self, text="Generate Word Search", command=self.generate_word_search)
+        self.generate_button = tk.Button(self, text="Set size", command=self.generate_word_search)
         self.generate_button.pack()
 
         self.output_text = tk.Text(self, height=10, width=50)
@@ -198,7 +198,6 @@ class WordSearchGUI(tk.Tk):
             self.output_text.delete(1.0, tk.END)
             self.output_text.insert(tk.END, f"Type a word in the box below:\n")
             self.output_text.insert(tk.END, f"Spaces remaining: {size * size}\n")
-            self.output_text.insert(tk.END, f"Max word length: {size}\n")
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
