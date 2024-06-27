@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import messagebox
 from WordSearch import WordSearch
 
-
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -19,6 +18,7 @@ class WordSearchGUI(tk.Tk):
         self.auto_button = None
         self.done_button = None
         self.grid_frame = None
+        self.grid_window = None
         self.initialize_gui()
 
     def initialize_gui(self):
@@ -55,7 +55,7 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
 
-            text_height = min(max(size * 2.5, 10), 30)
+            text_height = min(max(size * 3, 10), 30)
             text_width = min(max(size * 5, 40), 80)
 
             self.output_text.config(height=text_height, width=text_width)
@@ -146,13 +146,25 @@ class WordSearchGUI(tk.Tk):
         if self.grid_frame:
             self.grid_frame.destroy()
 
-        self.grid_frame = tk.Frame(self)
-        self.grid_frame.pack()
+        if self.grid_window:
+            self.grid_window.destroy()
+
+        if self.word_search.size > 16:
+            self.grid_window = tk.Toplevel(self)
+            self.grid_window.title("Word Search Grid")
+            self.grid_frame = tk.Frame(self.grid_window, padx=20, pady=20)
+        else:
+            self.grid_frame = tk.Frame(self, padx=20, pady=20)
+
+        self.grid_frame.pack(padx=20, pady=20)
+
+        # Adjust font size based on grid size
+        font_size = max(12, 20 - self.word_search.size // 2)
 
         for r, row in enumerate(self.word_search.grid):
             for c, letter in enumerate(row):
                 label = tk.Label(self.grid_frame, text=letter, borderwidth=0, relief="solid", width=4, height=2,
-                                 font=("Helvetica", 16))
+                                 font=("Helvetica", font_size))
                 label.grid(row=r, column=c)
                 label.bind("<Button-1>", self.on_label_click)
 
@@ -171,7 +183,7 @@ class WordSearchGUI(tk.Tk):
             max_columns = output_width // (max_word_length + 2)
 
             num_rows = math.ceil(len(word_bank) / max_columns)
-            text_height = max(num_rows, 5)
+            text_height = max(num_rows * 1.25, 5)
 
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
@@ -185,7 +197,6 @@ class WordSearchGUI(tk.Tk):
             self.output_text.insert(tk.END, word_bank_text + "\n", "center")
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
-
 
 if __name__ == '__main__':
     app = WordSearchGUI()
