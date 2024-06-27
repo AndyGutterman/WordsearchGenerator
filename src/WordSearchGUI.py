@@ -193,6 +193,9 @@ class WordSearchGUI(tk.Tk):
                 label.grid(row=r, column=c)
                 label.bind("<Button-1>", self.on_label_click)
 
+        if self.char_slider:
+            self.char_slider.pack_forget()
+
     def highlight_label(self, label):
         info = label.grid_info()
         row, col = info['row'], info['column']
