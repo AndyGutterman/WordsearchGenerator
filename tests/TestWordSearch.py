@@ -1,14 +1,21 @@
 from src.WordSearch import WordSearch
 
-
 class TestWordSearch(WordSearch):
     def __init__(self, size, predefined_words=None):
         super().__init__(size)
         if predefined_words:
             self.words = predefined_words
 
-
-
+    def run_test(self):
+        try:
+            self.place_words()
+            self.fill_grid()
+            self.show_grid()
+            self.print_word_locations()
+            return True
+        except Exception as e:
+            print(f"Test failed with error: {e}")
+            return False
 
 def run_test(test_id, size, predefined_words=None):
     if predefined_words:
@@ -17,16 +24,7 @@ def run_test(test_id, size, predefined_words=None):
         test_word_search = TestWordSearch(size)
         test_word_search.generate_words(int(0.75 * size * size))
 
-    try:
-        test_word_search.place_words()
-        test_word_search.fill_grid()
-        test_word_search.show_grid()
-        test_word_search.print_word_locations()
-        return True
-    except Exception as e:
-        print(f"Test {test_id} failed with error: {e}")
-        return False
-
+    return test_word_search.run_test()
 
 if __name__ == '__main__':
     tests = [
@@ -37,7 +35,6 @@ if __name__ == '__main__':
         (6, ["RED", "GREEN", "BLUE", "YELLOW"]),
         (5, ["DOGGY", "DOGGY", "DOGGY", "DOGGY", "DOGGY"]),
     ]
-
 
     for i in range(3, 28):
         tests.append((i, None))

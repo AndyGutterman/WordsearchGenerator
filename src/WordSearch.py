@@ -1,5 +1,6 @@
 import random
-from src.WordPlacer import WordPlacer
+from src.WordPlacer import WordPlacer  # Assuming WordPlacer is defined elsewhere
+
 
 class WordSearch:
     def __init__(self, size=None):
@@ -65,6 +66,7 @@ class WordSearch:
         print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
         r_big = random.randint(1, 2)
         current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
+
         try:
             for word in self.words:
                 if word in self.word_locations:
@@ -77,20 +79,27 @@ class WordSearch:
                     else:
                         r = random.randint(1, 3)
                     if r == 1:
-                        placed = WordPlacer.place_vertical(self, letters)
+                        result = WordPlacer.place_vertical(self, letters)
+                        if result:
+                            placed, start, end = result
+                            self.word_locations[word] = [(start, end, 'vertical')]
                     elif r == 2:
-                        placed = WordPlacer.place_horizontal(self, letters)
+                        result = WordPlacer.place_horizontal(self, letters)
+                        if result:
+                            placed, start, end = result
+                            self.word_locations[word] = [(start, end, 'horizontal')]
                     elif r == 3:
-                        placed = WordPlacer.place_diagonal(self, letters)
+                        result = WordPlacer.place_diagonal(self, letters)
+                        if result:
+                            placed, start, end = result
+                            self.word_locations[word] = [(start, end, 'diagonal')]
 
-                if placed:
-                    big_words_count -= 1
-                    self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
-
+                    if placed:
+                        big_words_count -= 1
 
         except Exception as e:
             print(f"Error occurred during word placement: {e}")
-            self.grid = current_grid_state  # Revert to previous grid state
+            self.grid = current_grid_state
 
     def fill_grid(self):
         for row in self.grid:
@@ -122,19 +131,13 @@ class WordSearch:
         print(f"{file_name}.txt created")
 
     def print_word_locations(self):
-        printed_words = set()
         for word in self.words:
-            if tuple(word) in self.word_locations and word not in printed_words:
-                placements = self.word_locations[tuple(word)]
-                for start, direction in placements:
-                    try:
-                        print(f"{word}: Row/Col {start}, Direction {direction}")
-                    except IndexError as e:
-                        print(f"Error printing {word}: {e}")
-                printed_words.add(word)
-            elif word not in printed_words:
+            if word in self.word_locations:
+                placements = self.word_locations[word]
+                for start, end, direction in placements:
+                    print(f"{word}: Row/Col {start}, Direction {direction} to {end}")
+            else:
                 print(f"{word}: Not placed")
-                printed_words.add(word)
 
 
 def customize():
@@ -145,10 +148,12 @@ def customize():
     word_search.take_words()
     return word_search
 
+
 if __name__ == '__main__':
     word_search = customize()
     word_search.place_words()
     word_search.fill_grid()
     word_search.show_grid()
     word_search.show_wordbank()
+    #ord_search.print_word_locations()
     word_search.txt_print()
