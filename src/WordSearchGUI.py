@@ -20,7 +20,7 @@ class WordSearchGUI(tk.Tk):
         self.done_button = None
         self.grid_frame = None
         self.grid_window = None
-        self.characters_remaining_slider = None
+        self.char_slider = None
         self.initialize_gui()
 
     def initialize_gui(self):
@@ -37,7 +37,6 @@ class WordSearchGUI(tk.Tk):
         self.size_button = tk.Button(self.label_frame, text="Set", command=self.set_size)
         self.size_button.pack(side=tk.LEFT)
 
-        # Create a frame for output text and slider
         text_and_slider_frame = tk.Frame(self)
         text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
 
@@ -49,10 +48,10 @@ class WordSearchGUI(tk.Tk):
         initial_message = "\n\n\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
 
-        # Initialize characters remaining slider
-        self.characters_remaining_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
-        self.characters_remaining_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        self.characters_remaining_slider.configure(state=tk.DISABLED)  # Disable slider
+        # Initialize slider
+        self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
+        self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.char_slider.configure(state=tk.DISABLED)  # Disable slider
 
     def set_size(self, event=None):
         try:
@@ -79,17 +78,16 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(state=tk.DISABLED)
 
             # Update characters remaining slider properties
-            self.characters_remaining_slider.config(from_=size * size, to=0, length=text_height * 7)
+            self.char_slider.config(from_=0, to=size * size, length=text_height * 7)
             self.update_characters_remaining(size * size)
-
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
 
     def update_characters_remaining(self, remaining):
-        self.characters_remaining_slider.config(state=tk.NORMAL)
-        self.characters_remaining_slider.set(remaining)
-        self.characters_remaining_slider.config(state=tk.DISABLED)
+        self.char_slider.config(state=tk.NORMAL)
+        self.char_slider.set(remaining)
+        self.char_slider.config(state=tk.DISABLED)
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
@@ -224,8 +222,8 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
 
-        if self.characters_remaining_slider:
-            self.characters_remaining_slider.pack_forget()
+        if self.char_slider:
+            self.char_slider.pack_forget()
 
 
 if __name__ == '__main__':
