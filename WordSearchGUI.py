@@ -39,7 +39,7 @@ class WordSearchGUI(tk.Tk):
         self.output_text = tk.Text(self, height=10, width=40)  # Initial size
         self.output_text.pack(pady=10)
 
-    def set_size(self):
+    def set_size(self, event=None):
         try:
             size = int(self.size_entry.get().strip())
             if size <= 0:
@@ -89,7 +89,7 @@ class WordSearchGUI(tk.Tk):
         self.show_word_search()
         self.show_wordbank()
 
-    def add_word(self):
+    def add_word(self, event=None):
         word = self.word_entry.get().strip().upper()
         if word == 'DONE':
             self.create()
@@ -144,7 +144,6 @@ class WordSearchGUI(tk.Tk):
                     line += word.ljust(max_word_length + 2)
             self.output_text.insert(tk.END, line + "\n")
         self.output_text.config(state=tk.DISABLED)
-
 
 if __name__ == '__main__':
     app = WordSearchGUI()
