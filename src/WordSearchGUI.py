@@ -1,7 +1,7 @@
 import math
 import tkinter as tk
 from tkinter import messagebox
-from src.WordSearch import WordSearch  # Import your WordSearch class from src.WordSearch
+from src.WordSearch import WordSearch
 
 class WordSearchGUI(tk.Tk):
     def __init__(self):
@@ -238,10 +238,8 @@ class WordSearchGUI(tk.Tk):
         self.check_highlighted_tiles()
 
     def strike_through_output_text(self, found_words):
-        # Remove strike-through from all text first
         self.output_text.tag_remove("strike", "1.0", tk.END)
 
-        # Add strike-through only to found words
         for word in found_words:
             start_index = "1.0"
             while True:
@@ -278,7 +276,7 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
 
-        # Get the found words from check_highlighted_tiles
+        # Get found words from check_highlighted_tiles
         found_words = []
         for word in self.word_search.words:
             positions = self.word_search.find_word(word)
@@ -289,7 +287,6 @@ class WordSearchGUI(tk.Tk):
                     found_words.append(word)
         print("Found words:", found_words)
 
-        # Apply strike-through only to found words
         self.strike_through_output_text(found_words)
 
 if __name__ == '__main__':
