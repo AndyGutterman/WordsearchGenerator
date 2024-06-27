@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 from src.WordSearch import WordSearch
 
+
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -19,6 +20,7 @@ class WordSearchGUI(tk.Tk):
         self.done_button = None
         self.grid_frame = None
         self.grid_window = None
+        self.characters_remaining_slider = None
         self.initialize_gui()
 
     def initialize_gui(self):
@@ -35,13 +37,22 @@ class WordSearchGUI(tk.Tk):
         self.size_button = tk.Button(self.label_frame, text="Set", command=self.set_size)
         self.size_button.pack(side=tk.LEFT)
 
-        # Initialize output text here
-        self.output_text = tk.Text(self, height=10, width=40, wrap=tk.WORD)
-        self.output_text.pack(pady=(10, 20), padx=20)
+        # Create a frame for output text and slider
+        text_and_slider_frame = tk.Frame(self)
+        text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
+
+        # Initialize output text
+        self.output_text = tk.Text(text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
+        self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         self.output_text.tag_configure("center", justify='center')
 
         initial_message = "\n\n\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
+
+        # Initialize characters remaining slider
+        self.characters_remaining_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
+        self.characters_remaining_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.characters_remaining_slider.configure(state=tk.DISABLED)  # Disable slider
 
     def set_size(self, event=None):
         try:
@@ -67,15 +78,25 @@ class WordSearchGUI(tk.Tk):
             self.output_text.insert(tk.END, new_message + "\n", "center")
             self.output_text.config(state=tk.DISABLED)
 
+            # Update characters remaining slider properties
+            self.characters_remaining_slider.config(from_=size * size, to=0, length=text_height * 7)
+            self.update_characters_remaining(size * size)
+
+
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
+
+    def update_characters_remaining(self, remaining):
+        self.characters_remaining_slider.config(state=tk.NORMAL)
+        self.characters_remaining_slider.set(remaining)
+        self.characters_remaining_slider.config(state=tk.DISABLED)
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
 
         if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
             self.output_text.config(state=tk.NORMAL)
-            self.output_text.delete(1.0, tk.END)  # Delete initial message
+            self.output_text.delete(1.0, tk.END)
             self.output_text.config(state=tk.DISABLED)
         # New content:
         self.output_text.config(state=tk.NORMAL)
@@ -122,6 +143,7 @@ class WordSearchGUI(tk.Tk):
 
     def add_word(self, event=None):
         word = self.word_entry.get().strip().upper()
+
         if word == 'DONE':
             self.create()
         elif word == 'AUTO':
@@ -132,6 +154,9 @@ class WordSearchGUI(tk.Tk):
             remaining_spaces = self.word_search.size * self.word_search.size - sum(
                 len(w) for w in self.word_search.words)
             self.update_output_text(f"Added {word}, {remaining_spaces} characters left")
+            self.update_characters_remaining(remaining_spaces)
+            if remaining_spaces <= 0:
+                self.create()
         else:
             messagebox.showerror("Error", "The word you've typed is too large, please choose another word")
 
@@ -158,7 +183,6 @@ class WordSearchGUI(tk.Tk):
 
         self.grid_frame.pack(padx=20, pady=20)
 
-        # Adjust font size based on grid size
         font_size = max(12, 20 - self.word_search.size // 2)
 
         for r, row in enumerate(self.word_search.grid):
@@ -197,6 +221,10 @@ class WordSearchGUI(tk.Tk):
             self.output_text.insert(tk.END, word_bank_text + "\n", "center")
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
+
+        if self.characters_remaining_slider:
+            self.characters_remaining_slider.pack_forget()
+
 
 if __name__ == '__main__':
     app = WordSearchGUI()
