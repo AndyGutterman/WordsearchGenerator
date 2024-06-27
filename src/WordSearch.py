@@ -158,6 +158,7 @@ class WordSearch:
             (1, 1),  # diagonal \
             (-1, 1)  # diagonal /
         ]
+        found_positions = []
 
         for r in range(self.size):
             for c in range(self.size):
@@ -167,9 +168,10 @@ class WordSearch:
 
                     if 0 <= end_r < self.size and 0 <= end_c < self.size:
                         if all(self.grid[r + i * dr][c + i * dc] == word[i] for i in range(word_length)):
-                            return [(r, c), (end_r, end_c)]
+                            positions = [(r + i * dr, c + i * dc) for i in range(word_length)]
+                            found_positions.extend(positions)
 
-        return None
+        return found_positions if found_positions else None
 
 
 def customize():
