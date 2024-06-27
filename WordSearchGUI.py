@@ -1,7 +1,7 @@
+import math
 import tkinter as tk
 from tkinter import messagebox
 from WordSearch import WordSearch
-import math
 
 
 class WordSearchGUI(tk.Tk):
@@ -50,32 +50,39 @@ class WordSearchGUI(tk.Tk):
                 messagebox.showerror("Error", "Size must be a positive integer.")
                 return
 
-            # Update size of text widget based on grid size (within limits)
-            text_height = min(max(size * 2, 10), 30)
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.delete(1.0, tk.END)
+
+            text_height = min(max(size * 1.2, 10), 30)
             text_width = min(max(size * 4, 40), 80)
+
             self.output_text.config(height=text_height, width=text_width)
 
             self.word_search = WordSearch(size)
             self.take_words_gui()
 
-            # Disable after setting size
-            self.size_entry.config(state=tk.DISABLED)
-            self.size_button.config(state=tk.DISABLED)
-
-            # Clear previous output
-            self.output_text.delete(1.0, tk.END)
-            new_message = ("\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished")
+            new_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
             self.output_text.insert(tk.END, new_message + "\n", "center")
+            self.output_text.config(state=tk.DISABLED)
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
 
+    def update_output_text(self, new_content):
+        current_content = self.output_text.get(1.0, tk.END)
+
+        if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.delete(1.0, tk.END)  # Delete initial message
+            self.output_text.config(state=tk.DISABLED)
+        # New content:
+        self.output_text.config(state=tk.NORMAL)
+        self.output_text.insert(tk.END, new_content + "\n", "center")
+        self.output_text.config(state=tk.DISABLED)
+
     def take_words_gui(self):
         button_frame = tk.Frame(self)
         button_frame.pack()
-
-        self.size_entry.pack(in_=self.label_frame, side=tk.LEFT, padx=(0, 20))
-        self.size_button.pack(in_=self.label_frame, side=tk.LEFT)
 
         self.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=self.auto_generate_words)
         self.auto_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
@@ -93,12 +100,18 @@ class WordSearchGUI(tk.Tk):
         self.add_word_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
         self.add_word_button.config(state=tk.DISABLED)
         self.add_word_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
+
     def on_word_entry_focus(self, event):
         if self.word_entry.get() == 'click to enter word':
             self.word_entry.delete(0, 'end')
             self.add_word_button.config(state=tk.NORMAL)
 
     def create(self):
+        self.auto_button.config(state=tk.DISABLED)
+        self.done_button.config(state=tk.DISABLED)
+        self.add_word_button.config(state=tk.DISABLED)
+        self.word_entry.config(state=tk.DISABLED)
+
         self.word_search.place_words()
         self.word_search.fill_grid()
         self.show_word_search()
@@ -114,19 +127,15 @@ class WordSearchGUI(tk.Tk):
         elif len(word) <= self.word_search.size and len(word) <= self.word_search.size * self.word_search.size - sum(
                 len(w) for w in self.word_search.words):
             self.word_search.words.append(word)
-            self.output_text.insert(tk.END, f"Added word: {word}\n", "center")
             remaining_spaces = self.word_search.size * self.word_search.size - sum(
                 len(w) for w in self.word_search.words)
-            self.output_text.insert(tk.END, f"Spaces remaining: {remaining_spaces}\n", "center")
+            self.update_output_text(f"Added {word}, {remaining_spaces} characters left")
         else:
             messagebox.showerror("Error", "The word you've typed is too large, please choose another word")
+
         self.word_entry.delete(0, tk.END)
 
     def auto_generate_words(self):
-        self.auto_button.config(state=tk.DISABLED)
-        self.done_button.config(state=tk.DISABLED)
-        self.add_word_button.config(state=tk.DISABLED)
-        self.word_entry.config(state=tk.DISABLED)
         spaces_remaining = self.word_search.size * self.word_search.size - sum(len(w) for w in self.word_search.words)
         self.word_search.generate_words(spaces_remaining)
         self.create()
@@ -138,15 +147,10 @@ class WordSearchGUI(tk.Tk):
         self.grid_frame = tk.Frame(self)
         self.grid_frame.pack()
 
-        # Adjust the size of the grid cells to fit larger grids
-        cell_width = 3 if self.word_search.size > 15 else 4
-        cell_height = 1 if self.word_search.size > 15 else 2
-        font_size = 12 if self.word_search.size > 15 else 16
-
         for r, row in enumerate(self.word_search.grid):
             for c, letter in enumerate(row):
-                label = tk.Label(self.grid_frame, text=letter, borderwidth=0, relief="solid", width=cell_width,
-                                 height=cell_height, font=("Helvetica", font_size))
+                label = tk.Label(self.grid_frame, text=letter, borderwidth=0, relief="solid", width=4, height=2,
+                                 font=("Helvetica", 16))
                 label.grid(row=r, column=c)
                 label.bind("<Button-1>", self.on_label_click)
 
@@ -156,33 +160,29 @@ class WordSearchGUI(tk.Tk):
         messagebox.showinfo("Letter Clicked", f"You clicked on: {letter}")
 
     def show_wordbank(self):
-        self.output_text.delete(1.0, tk.END)
         word_bank = self.word_search.words
         if not word_bank:
-            return
+            self.update_output_text("Word Bank is empty.")
+        else:
+            max_word_length = max(len(word) for word in word_bank)
+            output_width = self.output_text.cget('width')
+            max_columns = output_width // (max_word_length + 2)
 
-        output_width = self.output_text.cget('width')  # Get the width of the output text widget
-        word_bank_text = "Word Bank:"
-        centered_word_bank_text = word_bank_text.center(output_width)
+            num_rows = math.ceil(len(word_bank) / max_columns)
+            text_height = max(num_rows, 2)
 
-        self.output_text.insert(tk.END, "\n" + centered_word_bank_text + "\n", "center")
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.delete(1.0, tk.END)
 
-        max_word_length = max(len(word) for word in word_bank)
-        max_columns = output_width // (max_word_length + 2)
-        num_words = len(word_bank)
-        num_rows = math.ceil(num_words / max_columns)
+            word_bank_text = "Word Bank:\n"
+            for i, word in enumerate(word_bank, start=1):
+                word_bank_text += f"{word.ljust(max_word_length + 2)}"
+                if i % max_columns == 0:
+                    word_bank_text += "\n"
 
-        centered_lines = []
-        for row in range(num_rows):
-            line = ""
-            for col in range(max_columns):
-                index = row + col * num_rows
-                if index < num_words:
-                    word = word_bank[index]
-                    line += word.ljust(max_word_length + 2)
-            centered_lines.append(line.center(output_width))
-
-        self.output_text.insert(tk.END, "\n".join(centered_lines) + "\n", "center")
+            self.output_text.insert(tk.END, word_bank_text + "\n", "center")
+            self.output_text.config(height=text_height)
+            self.output_text.config(state=tk.DISABLED)
 
 
 if __name__ == '__main__':
