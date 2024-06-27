@@ -77,10 +77,10 @@ class WordSearchGUI(tk.Tk):
         button_frame = tk.Frame(self)
         button_frame.pack(padx=8, pady=10)
 
-        self.auto_button = tk.Button(button_frame, text="Auto", command=self.auto_generate_words)
+        self.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=self.auto_generate_words)
         self.auto_button.pack(side=tk.LEFT, padx=(0, 10))
 
-        self.done_button = tk.Button(button_frame, text="Done", command=self.create)
+        self.done_button = tk.Button(button_frame, text="Done", fg='green', command=self.create)
         self.done_button.pack(side=tk.LEFT, padx=(10, 0))
 
     def create(self):
