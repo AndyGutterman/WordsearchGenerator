@@ -1,6 +1,5 @@
-import os
 import random
-from Helpers.WordPlacer import WordPlacer
+from src.WordPlacer import WordPlacer
 
 class WordSearch:
     def __init__(self, size=None):
@@ -54,7 +53,7 @@ class WordSearch:
                 break
 
     def generate_word(self, length):
-        with open('wordlist.txt', 'r') as f:
+        with open('../data/wordlist.txt', 'r') as f:
             all_words = f.read().splitlines()
             cleaned_words = [word.replace('-', '').replace("'", '').upper() for word in all_words]
             filtered_words = [word for word in cleaned_words if len(word) == length]

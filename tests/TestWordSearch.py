@@ -1,5 +1,4 @@
-import random
-from WordSearch import WordSearch
+from src.WordSearch import WordSearch
 
 
 class TestWordSearch(WordSearch):
