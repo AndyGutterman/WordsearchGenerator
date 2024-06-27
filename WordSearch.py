@@ -3,12 +3,15 @@ import random
 from Helpers.WordPlacer import WordPlacer
 
 class WordSearch:
-    def __init__(self, size):
+    def __init__(self, size=None):
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
         self.word_locations = {}
         self.occupied_positions = set()
+
+    def set_size(self, size):
+        self.size = size
 
     def take_words(self):
         spaces_remaining = self.size * self.size
