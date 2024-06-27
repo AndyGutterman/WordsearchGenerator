@@ -212,6 +212,44 @@ class WordSearchGUI(tk.Tk):
         else:
             label.config(bg='yellow')
             self.highlighted_labels.append(label)
+        self.check_highlighted_tiles()
+
+
+    def check_highlighted_tiles(self):
+        if len(self.highlighted_labels) < 2:
+            return
+        highlighted_positions = [(label.grid_info()['row'], label.grid_info()['column']) for label in
+                                 self.highlighted_labels]
+
+        for word in self.word_search.words:
+            word_length = len(word)
+
+            for start in range(len(highlighted_positions)):
+                for end in range(start + 1, len(highlighted_positions) + 1):
+                    if end - start == word_length:
+                        positions_to_check = highlighted_positions[start:end]
+
+                        # Check if positions_to_check match any direction of the word
+                        directions = [
+                            (1, 0),  # horizontal
+                            (0, 1),  # vertical
+                            (1, 1),  # diagonal \
+                            (-1, 1)  # diagonal /
+                        ]
+
+                        for dr, dc in directions:
+                            matched_word = []
+                            r, c = positions_to_check[0]
+
+                            for i in range(word_length):
+                                rr, cc = positions_to_check[i]
+                                if rr != r + dr * i or cc != c + dc * i:
+                                    break
+                                matched_word.append(self.word_search.grid[rr][cc])
+                            else:
+                                if ''.join(matched_word) == word:
+                                    print(f"Found word: {word}")
+                                    return
 
     def show_wordbank(self):
         word_bank = self.word_search.words
