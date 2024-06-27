@@ -7,6 +7,7 @@ from src.WordSearch import WordSearch
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.highlighted_labels = []
         self.title("Word Search Generator")
         self.word_search = None
         self.label_frame = None
@@ -195,7 +196,22 @@ class WordSearchGUI(tk.Tk):
     def on_label_click(self, event):
         label = event.widget
         letter = label.cget("text")
-        messagebox.showinfo("Letter Clicked", f"You clicked on: {letter}")
+
+        # Determine label's position
+        info = label.grid_info()
+        row = info['row']
+        col = info['column']
+
+        print(f"Highlighted {letter} at {row}, {col}")
+        self.highlight_label(label)
+
+    def highlight_label(self, label):
+        if label in self.highlighted_labels:
+            label.config(bg='SystemButtonFace')
+            self.highlighted_labels.remove(label)
+        else:
+            label.config(bg='yellow')
+            self.highlighted_labels.append(label)
 
     def show_wordbank(self):
         word_bank = self.word_search.words
