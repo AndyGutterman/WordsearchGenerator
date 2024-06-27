@@ -93,13 +93,28 @@ class WordSearchGUI(tk.Tk):
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
+
         if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
             self.output_text.config(state=tk.DISABLED)
+
         self.output_text.config(state=tk.NORMAL)
+
+        if "word bank" in new_content:
+            # Apply strikethrough to parts containing "word bank"
+            start_index = 1.0
+            while True:
+                start_index = self.output_text.search("word bank", start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len('word bank')}c"
+                self.output_text.tag_add("strike", start_index, end_index)
+                start_index = end_index
+
         self.output_text.insert(tk.END, new_content + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
+
 
     def take_words_gui(self):
         button_frame = tk.Frame(self)
@@ -229,6 +244,7 @@ class WordSearchGUI(tk.Tk):
         else:
             print("No labels are currently highlighted.")
 
+
     def check_highlighted_tiles(self):
         found_words = []
         for word in self.word_search.words:
@@ -239,6 +255,9 @@ class WordSearchGUI(tk.Tk):
                 if word_positions_set.issubset(highlighted_positions_set):
                     found_words.append(word)
         print("Found words:", found_words)
+        self.strike_through_output_text(found_words)
+
+
 
     def print_letter_positions(self):
         if self.word_search:
@@ -255,6 +274,21 @@ class WordSearchGUI(tk.Tk):
             print("No word search initialized yet.")
 
 
+    def strike_through_output_text(self, found_words):
+        # Remove strike-through from all text first
+        self.output_text.tag_remove("strike", "1.0", tk.END)
+
+        # Add strike-through only to found words
+        for word in found_words:
+            start_index = "1.0"
+            while True:
+                start_index = self.output_text.search(word, start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len(word)}c"
+                self.output_text.tag_configure("strike", overstrike=True)
+                self.output_text.tag_add("strike", start_index, end_index)
+                start_index = end_index
 
     def show_wordbank(self):
         word_bank = self.word_search.words
@@ -283,6 +317,20 @@ class WordSearchGUI(tk.Tk):
 
         if self.char_slider:
             self.char_slider.pack_forget()
+
+        # Get the found words from check_highlighted_tiles
+        found_words = []
+        for word in self.word_search.words:
+            positions = self.word_search.find_word(word)
+            if positions:
+                highlighted_positions_set = set(self.highlighted_positions)
+                word_positions_set = set(positions)
+                if word_positions_set.issubset(highlighted_positions_set):
+                    found_words.append(word)
+        print("Found words:", found_words)
+
+        # Apply strike-through only to found words
+        self.strike_through_output_text(found_words)
 
 
 if __name__ == '__main__':
