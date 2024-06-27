@@ -8,6 +8,7 @@ class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.highlighted_labels = []
+        self.highlighted_positions = []
         self.title("Word Search Generator")
         self.word_search = None
         self.label_frame = None
@@ -92,13 +93,28 @@ class WordSearchGUI(tk.Tk):
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
+
         if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
             self.output_text.config(state=tk.DISABLED)
+
         self.output_text.config(state=tk.NORMAL)
+
+        if "word bank" in new_content:
+            # Apply strikethrough to parts containing "word bank"
+            start_index = 1.0
+            while True:
+                start_index = self.output_text.search("word bank", start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len('word bank')}c"
+                self.output_text.tag_add("strike", start_index, end_index)
+                start_index = end_index
+
         self.output_text.insert(tk.END, new_content + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
+
 
     def take_words_gui(self):
         button_frame = tk.Frame(self)
@@ -197,59 +213,82 @@ class WordSearchGUI(tk.Tk):
         label = event.widget
         letter = label.cget("text")
 
-        # Determine label's position
-        info = label.grid_info()
-        row = info['row']
-        col = info['column']
-
-        print(f"Highlighted {letter} at {row}, {col}")
+        # Toggle highlighting of the label
         self.highlight_label(label)
 
+        # Print highlighted labels for debugging
+        self.print_highlighted_labels()
+
+        # Check if highlighted labels form any valid word
+        self.check_highlighted_tiles()
+
     def highlight_label(self, label):
-        if label in self.highlighted_labels:
+        info = label.grid_info()
+        row, col = info['row'], info['column']
+
+        if (row, col) in self.highlighted_positions:
             label.config(bg='SystemButtonFace')
-            self.highlighted_labels.remove(label)
+            self.highlighted_positions.remove((row, col))
         else:
             label.config(bg='yellow')
-            self.highlighted_labels.append(label)
-        self.check_highlighted_tiles()
+            self.highlighted_positions.append((row, col))
+
+    def print_highlighted_labels(self):
+        if self.highlighted_labels:
+            print("Highlighted Labels:")
+            for label in self.highlighted_labels:
+                label_text = label.cget("text")
+                info = label.grid_info()
+                label_position = (info['row'], info['column'])
+                print(f"Label text: {label_text}, Position: {label_position}")
+        else:
+            print("No labels are currently highlighted.")
 
 
     def check_highlighted_tiles(self):
-        if len(self.highlighted_labels) < 2:
-            return
-        highlighted_positions = [(label.grid_info()['row'], label.grid_info()['column']) for label in
-                                 self.highlighted_labels]
-
+        found_words = []
         for word in self.word_search.words:
-            word_length = len(word)
+            positions = self.word_search.find_word(word)
+            if positions:
+                highlighted_positions_set = set(self.highlighted_positions)
+                word_positions_set = set(positions)
+                if word_positions_set.issubset(highlighted_positions_set):
+                    found_words.append(word)
+        print("Found words:", found_words)
+        self.strike_through_output_text(found_words)
 
-            for start in range(len(highlighted_positions)):
-                for end in range(start + 1, len(highlighted_positions) + 1):
-                    if end - start == word_length:
-                        positions_to_check = highlighted_positions[start:end]
 
-                        # Check if positions_to_check match any direction of the word
-                        directions = [
-                            (1, 0),  # horizontal
-                            (0, 1),  # vertical
-                            (1, 1),  # diagonal \
-                            (-1, 1)  # diagonal /
-                        ]
 
-                        for dr, dc in directions:
-                            matched_word = []
-                            r, c = positions_to_check[0]
+    def print_letter_positions(self):
+        if self.word_search:
+            print("Letter Positions for Valid Word Locations:")
+            for word in self.word_search.words:
+                positions = self.word_search.find_word(word)
+                if positions:
+                    print(f"Word '{word}':")
+                    start_position = positions[0]
+                    end_position = positions[-1]
+                    print(f"  - Start: ({start_position[0]}, {start_position[1]})")
+                    print(f"  - End:   ({end_position[0]}, {end_position[1]})")
+        else:
+            print("No word search initialized yet.")
 
-                            for i in range(word_length):
-                                rr, cc = positions_to_check[i]
-                                if rr != r + dr * i or cc != c + dc * i:
-                                    break
-                                matched_word.append(self.word_search.grid[rr][cc])
-                            else:
-                                if ''.join(matched_word) == word:
-                                    print(f"Found word: {word}")
-                                    return
+
+    def strike_through_output_text(self, found_words):
+        # Remove strike-through from all text first
+        self.output_text.tag_remove("strike", "1.0", tk.END)
+
+        # Add strike-through only to found words
+        for word in found_words:
+            start_index = "1.0"
+            while True:
+                start_index = self.output_text.search(word, start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len(word)}c"
+                self.output_text.tag_configure("strike", overstrike=True)
+                self.output_text.tag_add("strike", start_index, end_index)
+                start_index = end_index
 
     def show_wordbank(self):
         word_bank = self.word_search.words
@@ -278,6 +317,20 @@ class WordSearchGUI(tk.Tk):
 
         if self.char_slider:
             self.char_slider.pack_forget()
+
+        # Get the found words from check_highlighted_tiles
+        found_words = []
+        for word in self.word_search.words:
+            positions = self.word_search.find_word(word)
+            if positions:
+                highlighted_positions_set = set(self.highlighted_positions)
+                word_positions_set = set(positions)
+                if word_positions_set.issubset(highlighted_positions_set):
+                    found_words.append(word)
+        print("Found words:", found_words)
+
+        # Apply strike-through only to found words
+        self.strike_through_output_text(found_words)
 
 
 if __name__ == '__main__':
