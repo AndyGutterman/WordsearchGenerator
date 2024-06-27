@@ -1,65 +1,35 @@
-import tkinter as tk
-from tkinter import messagebox
+import os
 import random
-from Helpers.WordPlacer import WordPlacer  # Assuming you have a WordPlacer module
+from Helpers.WordPlacer import WordPlacer
 
 class WordSearch:
-    def __init__(self, size):
+    def __init__(self, size=None):
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
         self.word_locations = {}
         self.occupied_positions = set()
 
-    def take_words_gui(self, gui_instance):
+    def set_size(self, size):
+        self.size = size
+
+    def take_words(self):
         spaces_remaining = self.size * self.size
 
-        def handle_input(word):
-            nonlocal spaces_remaining
-            word = word.strip().upper()
+        while spaces_remaining > 0:
+            word = input("Enter a word, 'done' if finished, 'auto' to auto-generate remaining:").strip().upper()
             if word == 'DONE' or spaces_remaining <= 0:
-                gui_instance.generate_button.config(state=tk.NORMAL)  # Enable generate button
-                gui_instance.output_text.insert(tk.END, "Input complete. Generating word search...\n")
-                gui_instance.output_text.see(tk.END)  # Scroll to the end of text widget
-                self.place_words()
-                self.fill_grid()
-                gui_instance.show_word_search(self)
-                return
-            elif word == 'AUTO':
+                break
+            if word == 'AUTO':
                 self.generate_words(spaces_remaining)
-                gui_instance.generate_button.config(state=tk.NORMAL)  # Enable generate button
-                gui_instance.output_text.insert(tk.END, "Input complete. Generating word search...\n")
-                gui_instance.output_text.see(tk.END)  # Scroll to the end of text widget
-                self.place_words()
-                self.fill_grid()
-                gui_instance.show_word_search(self)
-                return
+                break
 
             if len(word) <= self.size and len(word) <= spaces_remaining:
                 self.words.append(word)
                 spaces_remaining -= len(word)
-                gui_instance.output_text.insert(tk.END, f"Entered word: {word}. {spaces_remaining} spaces left\n")
-                gui_instance.output_text.see(tk.END)  # Scroll to the end of text widget
-                word_entry.delete(0, tk.END)  # Clear the entry widget here
+                print(f"You have {spaces_remaining} characters left")
             else:
-                messagebox.showerror("Error", "The word you've typed is too large. Please choose another word.")
-
-        gui_instance.generate_button.config(state=tk.DISABLED)  # Disable generate button
-
-        def on_submit():
-            word = word_input.get()
-            handle_input(word)
-
-        word_entry = tk.Entry(gui_instance)
-        word_entry.pack()
-
-        submit_button = tk.Button(gui_instance, text="Submit", command=on_submit)
-        submit_button.pack()
-
-        word_input = tk.StringVar()
-        word_entry.config(textvariable=word_input)
-
-        gui_instance.output_text.insert(tk.END, f"Spaces remaining: {spaces_remaining}, Max word length: {self.size}\n")
+                print("The word you've typed is too large, please choose another word")
 
     def generate_words(self, spaces_remaining):
         current_density = (self.size * self.size - spaces_remaining) / (self.size * self.size)
@@ -118,6 +88,7 @@ class WordSearch:
                     big_words_count -= 1
                     self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
 
+
         except Exception as e:
             print(f"Error occurred during word placement: {e}")
             self.grid = current_grid_state  # Revert to previous grid state
@@ -167,54 +138,18 @@ class WordSearch:
                 printed_words.add(word)
 
 
-class WordSearchGUI(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Word Search Generator")
-
-        self.label_size = tk.Label(self, text="Enter size for Word Search:")
-        self.label_size.pack()
-
-        self.size_entry = tk.Entry(self)
-        self.size_entry.pack()
-
-        self.generate_button = tk.Button(self, text="Set size", command=self.generate_word_search)
-        self.generate_button.pack()
-
-        self.output_text = tk.Text(self, height=10, width=50)
-        self.output_text.pack()
-
-    def generate_word_search(self):
-        try:
-            size = int(self.size_entry.get().strip())
-            if size <= 0:
-                messagebox.showerror("Error", "Size must be a positive integer.")
-                return
-
-            word_search = WordSearch(size)
-            word_search.take_words_gui(self)
-
-            # Clear previous output and show current settings
-            self.output_text.delete(1.0, tk.END)
-            self.output_text.insert(tk.END, f"Type a word in the box below:\n")
-            self.output_text.insert(tk.END, f"Spaces remaining: {size * size}\n")
-
-        except ValueError:
-            messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
-
-    def show_word_search(self, word_search):
-        self.output_text.delete(1.0, tk.END)
-        self.output_text.insert(tk.END, "Word Search Grid:\n")
-        for row in word_search.grid:
-            self.output_text.insert(tk.END, " ".join(map(str, row)) + "\n")
-
-        self.output_text.insert(tk.END, "\nWord Bank:\n")
-        for word in word_search.words:
-            self.output_text.insert(tk.END, word + "\n")
-
-        self.output_text.config(state=tk.DISABLED)  # Disable editing of the text widget
-
+def customize():
+    size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
+    if size == 0:
+        return WordSearch(size)
+    word_search = WordSearch(size)
+    word_search.take_words()
+    return word_search
 
 if __name__ == '__main__':
-    app = WordSearchGUI()
-    app.mainloop()
+    word_search = customize()
+    word_search.place_words()
+    word_search.fill_grid()
+    word_search.show_grid()
+    word_search.show_wordbank()
+    word_search.txt_print()
