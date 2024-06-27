@@ -93,12 +93,10 @@ class WordSearchGUI(tk.Tk):
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
-
         if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
             self.output_text.config(state=tk.DISABLED)
-        # New content:
         self.output_text.config(state=tk.NORMAL)
         self.output_text.insert(tk.END, new_content + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
@@ -155,6 +153,10 @@ class WordSearchGUI(tk.Tk):
                 len(w) for w in self.word_search.words)
             self.update_output_text(f"Added {word}, {remaining_spaces} characters left")
             self.update_characters_remaining(remaining_spaces)
+            if remaining_spaces <= (1 / 4 * self.word_search.size * self.word_search.size):
+                self.update_output_text(f"** Note: Grid nearly full **")
+            if remaining_spaces <= (1 / 8 * self.word_search.size * self.word_search.size):
+                self.update_output_text(f"** Warning: grid space very low - may not generate **")
             if remaining_spaces <= 0:
                 self.create()
         else:
