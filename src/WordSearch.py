@@ -187,5 +187,5 @@ if __name__ == '__main__':
     word_search.fill_grid()
     word_search.show_grid()
     word_search.show_wordbank()
-    word_search.print_word_locations()
     word_search.txt_print()
+    word_search.print_word_locations()
