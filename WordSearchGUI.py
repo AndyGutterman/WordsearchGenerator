@@ -49,12 +49,14 @@ class WordSearchGUI(tk.Tk):
             if size <= 0:
                 messagebox.showerror("Error", "Size must be a positive integer.")
                 return
+            self.size_entry.config(state=tk.DISABLED)
+            self.size_button.config(state=tk.DISABLED)
 
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
 
-            text_height = min(max(size * 1.2, 10), 30)
-            text_width = min(max(size * 4, 40), 80)
+            text_height = min(max(size * 2.5, 10), 30)
+            text_width = min(max(size * 5, 40), 80)
 
             self.output_text.config(height=text_height, width=text_width)
 
@@ -169,7 +171,7 @@ class WordSearchGUI(tk.Tk):
             max_columns = output_width // (max_word_length + 2)
 
             num_rows = math.ceil(len(word_bank) / max_columns)
-            text_height = max(num_rows, 2)
+            text_height = max(num_rows, 5)
 
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
