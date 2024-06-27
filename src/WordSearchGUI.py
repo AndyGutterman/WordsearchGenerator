@@ -1,7 +1,7 @@
 import math
 import tkinter as tk
 from tkinter import messagebox
-from WordSearch import WordSearch
+from src.WordSearch import WordSearch
 
 class WordSearchGUI(tk.Tk):
     def __init__(self):
