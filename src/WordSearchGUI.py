@@ -7,6 +7,7 @@ from src.WordSearch import WordSearch
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.highlighted_labels = []
         self.title("Word Search Generator")
         self.word_search = None
         self.label_frame = None
@@ -20,7 +21,7 @@ class WordSearchGUI(tk.Tk):
         self.done_button = None
         self.grid_frame = None
         self.grid_window = None
-        self.characters_remaining_slider = None
+        self.char_slider = None
         self.initialize_gui()
 
     def initialize_gui(self):
@@ -37,7 +38,6 @@ class WordSearchGUI(tk.Tk):
         self.size_button = tk.Button(self.label_frame, text="Set", command=self.set_size)
         self.size_button.pack(side=tk.LEFT)
 
-        # Create a frame for output text and slider
         text_and_slider_frame = tk.Frame(self)
         text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
 
@@ -49,10 +49,10 @@ class WordSearchGUI(tk.Tk):
         initial_message = "\n\n\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
 
-        # Initialize characters remaining slider
-        self.characters_remaining_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
-        self.characters_remaining_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        self.characters_remaining_slider.configure(state=tk.DISABLED)  # Disable slider
+        # Initialize slider
+        self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
+        self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.char_slider.configure(state=tk.DISABLED)  # Disable slider
 
     def set_size(self, event=None):
         try:
@@ -79,17 +79,16 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(state=tk.DISABLED)
 
             # Update characters remaining slider properties
-            self.characters_remaining_slider.config(from_=size * size, to=0, length=text_height * 7)
+            self.char_slider.config(from_=0, to=size * size, length=text_height * 7)
             self.update_characters_remaining(size * size)
-
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
 
     def update_characters_remaining(self, remaining):
-        self.characters_remaining_slider.config(state=tk.NORMAL)
-        self.characters_remaining_slider.set(remaining)
-        self.characters_remaining_slider.config(state=tk.DISABLED)
+        self.char_slider.config(state=tk.NORMAL)
+        self.char_slider.set(remaining)
+        self.char_slider.config(state=tk.DISABLED)
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
@@ -197,7 +196,60 @@ class WordSearchGUI(tk.Tk):
     def on_label_click(self, event):
         label = event.widget
         letter = label.cget("text")
-        messagebox.showinfo("Letter Clicked", f"You clicked on: {letter}")
+
+        # Determine label's position
+        info = label.grid_info()
+        row = info['row']
+        col = info['column']
+
+        print(f"Highlighted {letter} at {row}, {col}")
+        self.highlight_label(label)
+
+    def highlight_label(self, label):
+        if label in self.highlighted_labels:
+            label.config(bg='SystemButtonFace')
+            self.highlighted_labels.remove(label)
+        else:
+            label.config(bg='yellow')
+            self.highlighted_labels.append(label)
+        self.check_highlighted_tiles()
+
+
+    def check_highlighted_tiles(self):
+        if len(self.highlighted_labels) < 2:
+            return
+        highlighted_positions = [(label.grid_info()['row'], label.grid_info()['column']) for label in
+                                 self.highlighted_labels]
+
+        for word in self.word_search.words:
+            word_length = len(word)
+
+            for start in range(len(highlighted_positions)):
+                for end in range(start + 1, len(highlighted_positions) + 1):
+                    if end - start == word_length:
+                        positions_to_check = highlighted_positions[start:end]
+
+                        # Check if positions_to_check match any direction of the word
+                        directions = [
+                            (1, 0),  # horizontal
+                            (0, 1),  # vertical
+                            (1, 1),  # diagonal \
+                            (-1, 1)  # diagonal /
+                        ]
+
+                        for dr, dc in directions:
+                            matched_word = []
+                            r, c = positions_to_check[0]
+
+                            for i in range(word_length):
+                                rr, cc = positions_to_check[i]
+                                if rr != r + dr * i or cc != c + dc * i:
+                                    break
+                                matched_word.append(self.word_search.grid[rr][cc])
+                            else:
+                                if ''.join(matched_word) == word:
+                                    print(f"Found word: {word}")
+                                    return
 
     def show_wordbank(self):
         word_bank = self.word_search.words
@@ -224,8 +276,8 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
 
-        if self.characters_remaining_slider:
-            self.characters_remaining_slider.pack_forget()
+        if self.char_slider:
+            self.char_slider.pack_forget()
 
 
 if __name__ == '__main__':
