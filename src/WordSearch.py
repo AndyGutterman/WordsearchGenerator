@@ -7,7 +7,7 @@ class WordSearch:
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
-        self.word_locations = {}    # Stores word locations
+        self.word_locations = {}  # Stores word locations
         self.occupied_positions = set()
 
     def set_size(self, size):
@@ -62,6 +62,7 @@ class WordSearch:
 
     def place_words(self):
         self.words.sort(key=len, reverse=True)
+        max_spaces = self.size ** 2
         big_words_count = sum(1 for word in self.words if len(word) == self.size)
         print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
         r_big = random.randint(1, 2)
@@ -73,21 +74,20 @@ class WordSearch:
                 letters = list(word)
                 placed = False
                 while not placed:
-                    if (big_words_count >= 1):
+                    if big_words_count >= 1:
                         r = r_big
                     else:
                         r = random.randint(1, 3)
                     if r == 1:
-                        placed = WordPlacer.place_vertical(self, letters)
+                        placed = WordPlacer.place(self, letters, max_spaces, direction="vertical")
                     elif r == 2:
-                        placed = WordPlacer.place_horizontal(self, letters)
+                        placed = WordPlacer.place(self, letters, max_spaces, direction="horizontal")
                     elif r == 3:
-                        placed = WordPlacer.place_diagonal(self, letters)
+                        placed = WordPlacer.place(self, letters, max_spaces, direction="diagonal")
 
                 if placed:
                     big_words_count -= 1
                     self.word_locations.setdefault(tuple(letters), [])
-
 
         except Exception as e:
             print(f"Error occurred during word placement: {e}")
