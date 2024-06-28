@@ -1,5 +1,5 @@
 import random
-
+# todo: add reverse placement
 
 class WordPlacer:
     @staticmethod
@@ -12,7 +12,7 @@ class WordPlacer:
             row_num = random.randint(0, size - len(letters))
             column_num = random.randint(0, size - len(letters))
 
-            if WordPlacer.can_place_diagonal(grid, row_num, column_num, letters):
+            if WordPlacer.can_place(grid, row_num, column_num, letters, direction="diagonal"):
                 for i in range(len(letters)):
                     grid[row_num + i][column_num + i] = letters[i]
                 start = (row_num, column_num)
@@ -33,7 +33,7 @@ class WordPlacer:
             row_num = random.randint(0, size - 1)
             column_num = random.randint(0, size - len(letters))
 
-            if WordPlacer.can_place_horizontal(grid, row_num, column_num, letters):
+            if WordPlacer.can_place(grid, row_num, column_num, letters, direction="horizontal"):
                 for i in range(len(letters)):
                     grid[row_num][column_num + i] = letters[i]
                 start = (row_num, column_num)
@@ -54,7 +54,7 @@ class WordPlacer:
             row_num = random.randint(0, size - len(letters))
             column_num = random.randint(0, size - 1)
 
-            if WordPlacer.can_place_vertical(grid, row_num, column_num, letters):
+            if WordPlacer.can_place(grid, row_num, column_num, letters, direction="vertical"):
                 for i in range(len(letters)):
                     grid[row_num + i][column_num] = letters[i]
                 start = (row_num, column_num)
@@ -66,28 +66,29 @@ class WordPlacer:
         return False
 
     @staticmethod
-    def can_place_diagonal(grid, row_num, column_num, letters):
+    def can_place(grid, row_num, column_num, letters, direction):
         size = len(letters)
-        if row_num + size > len(grid) or column_num + size > len(grid):
-            return False
+        if direction == "diagonal":
+            if row_num + size > len(grid) or column_num + size > len(grid):
+                return False
 
-        return all(grid[row_num + i][column_num + i] in [0, letters[i]] for i in range(size))
+            return all(grid[row_num + i][column_num + i] in [0, letters[i]] for i in range(size))
+        if direction == "horizontal":
+            if column_num + size > len(grid[row_num]):
+                return False
 
-    @staticmethod
-    def can_place_horizontal(grid, row_num, column_num, letters):
-        size = len(letters)
-        if column_num + size > len(grid[row_num]):
-            return False
+            return all(grid[row_num][column_num + i] in [0, letters[i]] for i in range(size))
 
-        return all(grid[row_num][column_num + i] in [0, letters[i]] for i in range(size))
+        if direction == "vertical":
+            if row_num + size > len(grid):
+                return False
 
-    @staticmethod
-    def can_place_vertical(grid, row_num, column_num, letters):
-        size = len(letters)
-        if row_num + size > len(grid):
-            return False
+            return all(grid[row_num + i][column_num] in [0, letters[i]] for i in range(size))
+        else:
+            print("can_place terminated")
+            return
 
-        return all(grid[row_num + i][column_num] in [0, letters[i]] for i in range(size))
+
 
     @staticmethod
     def check_existing_placement(word_search, letters, start, direction):
