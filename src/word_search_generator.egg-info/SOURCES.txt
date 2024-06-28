@@ -1,0 +1,8 @@
+README.md
+setup.py
+src/word_search_generator.egg-info/PKG-INFO
+src/word_search_generator.egg-info/SOURCES.txt
+src/word_search_generator.egg-info/dependency_links.txt
+src/word_search_generator.egg-info/entry_points.txt
+src/word_search_generator.egg-info/top_level.txt
+tests/TestWordSearch.py

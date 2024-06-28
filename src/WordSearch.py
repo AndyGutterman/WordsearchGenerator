@@ -1,5 +1,5 @@
 import random
-from src.WordPlacer import WordPlacer
+from WordPlacer import WordPlacer
 
 
 class WordSearch:
@@ -174,7 +174,7 @@ def customize():
     return wordsearch
 
 
-if __name__ == '__main__':
+def main():
     word_search = customize()
     word_search.place_words()
     word_search.fill_grid()

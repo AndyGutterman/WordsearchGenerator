@@ -1,4 +1,4 @@
-from src.WordSearch import WordSearch
+from WordSearch import WordSearch
 
 class TestWordSearch(WordSearch):
     def __init__(self, size, predefined_words=None):

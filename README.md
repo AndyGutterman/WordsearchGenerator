@@ -9,20 +9,17 @@
 - **Scalable Grid:** Customize grid size to suit different puzzle complexities.
 - **Interactive Interface:** User-friendly GUI that visualizes the generated puzzle and word bank.
 
+## Installation 
+1. Clone directory
+2. Navigate to cloned directory
+3. Install using 'pip install -e .'
+2. Start program using command 'wordsearch'
+
 ## How to Use
+1. Specify desired grid size.
+2. (Optional) Manually enter specific words.
+3. (Optional) Use the automatic word generation feature.
 
-### GUI Version
-1. Run `WordSearchGUI.py`.
-2. Specify desired grid size.
-3. (Optional) Manually enter specific words.
-4. (Optional) Use the automatic word generation feature.
-
-### CLI Version (includes file output)
-1. Run `WordSearch.py`.
-2. Specify desired grid size.
-3. (Optional) Manually enter specific words.
-4. (Optional) Type 'auto' for automatic word generation.
-5. Type 'done' to create and display.
 
 ## Requirements
 - Python 3.x

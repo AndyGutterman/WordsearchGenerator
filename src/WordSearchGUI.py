@@ -1,7 +1,7 @@
 import math
 import tkinter as tk
 from tkinter import messagebox
-from src.WordSearch import WordSearch
+from WordSearch import WordSearch
 
 
 class WordSearchGUI(tk.Tk):
@@ -326,6 +326,6 @@ class WordSearchGUI(tk.Tk):
         self.strike_through_output_text(found_words)
 
 
-if __name__ == '__main__':
+def main():
     app = WordSearchGUI()
     app.mainloop()
