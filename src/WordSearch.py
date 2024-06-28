@@ -7,7 +7,7 @@ class WordSearch:
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
-        self.word_locations = {}
+        self.word_locations = {} # Stores word locations
         self.occupied_positions = set()
 
     def set_size(self, size):
@@ -158,7 +158,7 @@ class WordSearch:
                     # Ensure ending row and column is within bounds
                     if 0 <= word_end_row < self.size and 0 <= word_end_col < self.size:
                         # If all letters match letters in word, add to found_positions list
-                        if all(self.grid[row + i * dr][row + i * dc] == word[i] for i in range(word_length)):
+                        if all(self.grid[row + i * dr][col + i * dc] == word[i] for i in range(word_length)):
                             positions = [(row + i * dr, col + i * dc) for i in range(word_length)]
                             found_positions.extend(positions)
 
