@@ -1,5 +1,5 @@
 import random
-from src.WordPlacer import WordPlacer  # Assuming WordPlacer is defined elsewhere
+from src.WordPlacer import WordPlacer
 
 
 class WordSearch:
@@ -7,7 +7,7 @@ class WordSearch:
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
-        self.word_locations = {} # Stores word locations
+        self.word_locations = {}    # Stores word locations
         self.occupied_positions = set()
 
     def set_size(self, size):
@@ -65,7 +65,7 @@ class WordSearch:
         big_words_count = sum(1 for word in self.words if len(word) == self.size)
         print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
         r_big = random.randint(1, 2)
-        current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
+        current_grid_state = [row[:] for row in self.grid]
         try:
             for word in self.words:
                 if word in self.word_locations:
@@ -86,7 +86,7 @@ class WordSearch:
 
                 if placed:
                     big_words_count -= 1
-                    self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
+                    self.word_locations.setdefault(tuple(letters), [])
 
 
         except Exception as e:
