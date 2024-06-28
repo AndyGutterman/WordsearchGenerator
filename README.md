@@ -12,7 +12,7 @@
 ## Installation 
 1. Clone directory
 2. Install using `pip install -e`
-3. Start the program using:
+3. Use a command to start the program:
 
 | Enter command    | desired version: |
 |:-----------------|:----------------:|
