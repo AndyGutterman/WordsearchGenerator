@@ -151,7 +151,7 @@ class WordSearchGUI(tk.Tk):
         self.word_search.fill_grid()
         self.show_word_search()
         self.show_wordbank()
-        self.word_search.print_word_locations()
+        # self.word_search.print_word_locations()
 
     def add_word(self, event=None):
         word = self.word_entry.get().strip().upper()
