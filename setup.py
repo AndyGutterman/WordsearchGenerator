@@ -2,13 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='word_search_generator',
-    packages=find_packages(where='src'),
+    version='0.9.5',
+    packages=find_packages('src'),
     package_dir={'': 'src'},
+    include_package_data=True,
+
     package_data={
-        '': ['data/wordlist.txt'],  # Adjust the path if necessary
+        '': ['../data/wordlist.txt'],  # Relative path to wordlist.txt from setup.py
     },
-    install_requires=[
-    ],
+
     entry_points={
         'console_scripts': [
             'wordsearchGUI=WordSearchGUI:main',

@@ -1,3 +1,4 @@
+import os
 import random
 from WordPlacer import WordPlacer
 
@@ -54,11 +55,17 @@ class WordSearch:
                 break
 
     def generate_word(self, length):
-        with open('../data/wordlist.txt', 'r') as f:
-            all_words = f.read().splitlines()
-            cleaned_words = [word.replace('-', '').replace("'", '').upper() for word in all_words]
-            filtered_words = [word for word in cleaned_words if len(word) == length]
-            return random.choice(filtered_words) if filtered_words else None
+        data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
+        wordlist_path = os.path.join(data_dir, 'wordlist.txt')
+        try:
+            with open(wordlist_path, 'r') as f:
+                all_words = f.read().splitlines()
+                cleaned_words = [word.replace('-', '').replace("'", '').upper() for word in all_words]
+                filtered_words = [word for word in cleaned_words if len(word) == length]
+                return random.choice(filtered_words) if filtered_words else None
+        except FileNotFoundError:
+            print(f"Error: File '{wordlist_path}' not found.")
+            return None
 
     def place_words(self):
         self.words.sort(key=len, reverse=True)
