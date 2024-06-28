@@ -16,11 +16,10 @@ class WordPlacer:
                 for i in range(len(letters)):
                     grid[row_num + i][column_num + i] = letters[i]
                 start = (row_num, column_num)
-                end = (row_num + len(letters) - 1, column_num + len(letters) - 1)
                 direction = "diagonal"
                 if not WordPlacer.check_existing_placement(word_search, letters, start, direction):
-                    word_search.word_locations.setdefault(tuple(letters), []).append((start, end, direction))
-                    return True, start, end
+                    word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
+                    return True
             attempts += 1
         return False
 
@@ -38,11 +37,10 @@ class WordPlacer:
                 for i in range(len(letters)):
                     grid[row_num][column_num + i] = letters[i]
                 start = (row_num, column_num)
-                end = (row_num, column_num + len(letters) - 1)
                 direction = "horizontal"
                 if not WordPlacer.check_existing_placement(word_search, letters, start, direction):
-                    word_search.word_locations.setdefault(tuple(letters), []).append((start, end, direction))
-                    return True, start, end
+                    word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
+                    return True
             attempts += 1
         return False
 
@@ -60,11 +58,10 @@ class WordPlacer:
                 for i in range(len(letters)):
                     grid[row_num + i][column_num] = letters[i]
                 start = (row_num, column_num)
-                end = (row_num + len(letters) - 1, column_num)
                 direction = "vertical"
                 if not WordPlacer.check_existing_placement(word_search, letters, start, direction):
-                    word_search.word_locations.setdefault(tuple(letters), []).append((start, end, direction))
-                    return True, start, end
+                    word_search.word_locations.setdefault(tuple(letters), []).append((start, direction))
+                    return True
             attempts += 1
         return False
 
@@ -96,7 +93,7 @@ class WordPlacer:
     def check_existing_placement(word_search, letters, start, direction):
         if tuple(letters) in word_search.word_locations:
             placements = word_search.word_locations[tuple(letters)]
-            for (existing_start, end, existing_direction) in placements:
+            for (existing_start, existing_direction) in placements:
                 if existing_start == start and existing_direction == direction:
                     return True
         return False

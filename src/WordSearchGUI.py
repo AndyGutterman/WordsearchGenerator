@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 from src.WordSearch import WordSearch
 
+
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -113,7 +114,6 @@ class WordSearchGUI(tk.Tk):
 
         self.output_text.insert(tk.END, new_content + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
-
 
     def take_words_gui(self):
         button_frame = tk.Frame(self)
@@ -240,9 +240,6 @@ class WordSearchGUI(tk.Tk):
                 info = label.grid_info()
                 label_position = (info['row'], info['column'])
                 print(f"Label text: {label_text}, Position: {label_position}")
-        else:
-            print("No labels are currently highlighted.")
-
 
     def check_highlighted_tiles(self):
         found_words = []
@@ -255,8 +252,6 @@ class WordSearchGUI(tk.Tk):
                     found_words.append(word)
         print("Found words:", found_words)
         self.strike_through_output_text(found_words)
-
-
 
     def print_letter_positions(self):
         if self.word_search:
@@ -271,7 +266,6 @@ class WordSearchGUI(tk.Tk):
                     print(f"  - End:   ({end_position[0]}, {end_position[1]})")
         else:
             print("No word search initialized yet.")
-
 
     def strike_through_output_text(self, found_words):
         # Remove strike-through from all text first

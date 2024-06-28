@@ -66,46 +66,32 @@ class WordSearch:
         print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
         r_big = random.randint(1, 2)
         current_grid_state = [row[:] for row in self.grid]  # Snapshot of current grid state
-
         try:
             for word in self.words:
                 if word in self.word_locations:
                     continue
                 letters = list(word)
-                letter_positions = []
-
                 placed = False
                 while not placed:
-                    if big_words_count >= 1:
+                    if (big_words_count >= 1):
                         r = r_big
                     else:
                         r = random.randint(1, 3)
-
                     if r == 1:
-                        result = WordPlacer.place_vertical(self, letters)
-                        if result:
-                            placed, start, end = result
-                            letter_positions = [(r, c) for r in range(start[0], end[0] + 1) for c in [start[1]]]
-                            self.word_locations[word] = [(start, end, 'vertical', letter_positions)]
+                        placed = WordPlacer.place_vertical(self, letters)
                     elif r == 2:
-                        result = WordPlacer.place_horizontal(self, letters)
-                        if result:
-                            placed, start, end = result
-                            letter_positions = [(r, c) for c in range(start[1], end[1] + 1) for r in [start[0]]]
-                            self.word_locations[word] = [(start, end, 'horizontal', letter_positions)]
+                        placed = WordPlacer.place_horizontal(self, letters)
                     elif r == 3:
-                        result = WordPlacer.place_diagonal(self, letters)
-                        if result:
-                            placed, start, end = result
-                            letter_positions = [(start[0] + i, start[1] + i) for i in range(len(letters))]
-                            self.word_locations[word] = [(start, end, 'diagonal', letter_positions)]
+                        placed = WordPlacer.place_diagonal(self, letters)
 
-                    if placed:
-                        big_words_count -= 1
+                if placed:
+                    big_words_count -= 1
+                    self.word_locations.setdefault(tuple(letters), [])  # Ensure key exists in dict
+
 
         except Exception as e:
             print(f"Error occurred during word placement: {e}")
-            self.grid = current_grid_state
+            self.grid = current_grid_state  # Revert to previous grid state
 
     def fill_grid(self):
         for row in self.grid:
@@ -140,15 +126,19 @@ class WordSearch:
         print(f"{file_name}.txt created")
 
     def print_word_locations(self):
+        printed_words = set()
         for word in self.words:
-            if word in self.word_locations:
-                placements = self.word_locations[word]
-                for start, end, direction, letter_positions in placements:
-                    print(f"{word}: Row/Col {start} to {end}, Direction {direction}")
-                    for letter_pos in letter_positions:
-                        print(f"Letter '{word[letter_pos[0] - start[0]]}' at position {letter_pos}")
-            else:
+            if tuple(word) in self.word_locations and word not in printed_words:
+                placements = self.word_locations[tuple(word)]
+                for start, direction in placements:
+                    try:
+                        print(f"{word}: Row/Col {start}, Direction {direction}")
+                    except IndexError as e:
+                        print(f"Error printing {word}: {e}")
+                printed_words.add(word)
+            elif word not in printed_words:
                 print(f"{word}: Not placed")
+                printed_words.add(word)
 
     def find_word(self, word):
         word_length = len(word)
