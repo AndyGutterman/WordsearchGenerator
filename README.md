@@ -1,29 +1,24 @@
 # Word Search Generator
 
-- This is a Python-based application featuring a graphical user interface (GUI) built using tkinter. 
-- It allows users to create custom word search puzzles of varying sizes. 
-- Dynamically adjusts the grid size and displays both the interactive puzzle and a word bank for easy reference.
+- This application allows users to create and solve custom word search puzzles of varying sizes.
+- Now featuring automatic generation options and file output to save previous puzzles.
 
-## Key Features
+
+### Key Features
 - **Dynamic Word Entry:** Enter words manually or opt for automatic generation.
 - **Scalable Grid:** Customize grid size to suit different puzzle complexities.
 - **Interactive Interface:** User-friendly GUI that visualizes the generated puzzle and word bank.
 
 ## Installation 
 1. Clone directory
-2. Navigate to cloned directory
-3. Install using 'pip install -e .'
-2. Start program using command 'wordsearch'
+2. Install using `pip install -e`
+3. Start the program using:
 
-## How to Use
-1. Specify desired grid size.
-2. (Optional) Manually enter specific words.
-3. (Optional) Use the automatic word generation feature.
+| Enter command    | desired version: |
+|:-----------------|:----------------:|
+| `wordsearchGUI`  |  Wordsearch GUI  |
+| `wordsearchCLI ` |  Wordsearch CLI  |
 
 
 ## Requirements
 - Python 3.x
-
-## Installation
-1. Clone the repository.
-2. Run and done.
