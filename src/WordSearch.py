@@ -7,7 +7,7 @@ class WordSearch:
         self.size = size
         self.grid = [[0] * size for _ in range(size)]
         self.words = []
-        self.word_locations = {}  # Updated to store letter positions
+        self.word_locations = {}
         self.occupied_positions = set()
 
     def set_size(self, size):
@@ -149,16 +149,17 @@ class WordSearch:
             (-1, 1)  # diagonal /
         ]
         found_positions = []
-
-        for r in range(self.size):
-            for c in range(self.size):
+        for row in range(self.size):
+            for col in range(self.size):
                 for dr, dc in directions:
-                    end_r = r + (word_length - 1) * dr
-                    end_c = c + (word_length - 1) * dc
+                    word_end_row = row + (word_length - 1) * dr
+                    word_end_col = col + (word_length - 1) * dc
 
-                    if 0 <= end_r < self.size and 0 <= end_c < self.size:
-                        if all(self.grid[r + i * dr][c + i * dc] == word[i] for i in range(word_length)):
-                            positions = [(r + i * dr, c + i * dc) for i in range(word_length)]
+                    # Ensure ending row and column is within bounds
+                    if 0 <= word_end_row < self.size and 0 <= word_end_col < self.size:
+                        # If all letters match letters in word, add to found_positions list
+                        if all(self.grid[row + i * dr][row + i * dc] == word[i] for i in range(word_length)):
+                            positions = [(row + i * dr, col + i * dc) for i in range(word_length)]
                             found_positions.extend(positions)
 
         return found_positions if found_positions else None
@@ -168,9 +169,9 @@ def customize():
     size = abs(int(input("Enter a size for the wordSearch:\n>>> ")))
     if size == 0:
         return WordSearch(size)
-    word_search = WordSearch(size)
-    word_search.take_words()
-    return word_search
+    wordsearch = WordSearch(size)
+    wordsearch.take_words()
+    return wordsearch
 
 
 if __name__ == '__main__':
