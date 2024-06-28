@@ -8,7 +8,7 @@ setup(
     include_package_data=True,
 
     package_data={
-        '': ['../data/wordlist.txt'],  # Relative path to wordlist.txt from setup.py
+        '': ['../data/wordlist.txt'],
     },
 
     entry_points={
