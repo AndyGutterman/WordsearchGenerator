@@ -4,18 +4,22 @@ from WordSearch import WordSearch
 from WordSearchGUI import WordSearchGUI
 
 class TestGUI(WordSearchGUI):
-    def __init__(self):
+    def __init__(self, grid_size):
         super().__init__()
+        self.grid_size = grid_size
         self.word_colors = {}
         self.highlighted_positions = []
+        self.found_words = []
 
     def highlight_all_word_positions_test(self):
         if self.word_search:
+            self.found_words = []
             all_positions = []
             for word in self.word_search.words:
                 positions = self.word_search.find_word(word)
                 if positions:
                     all_positions.extend(positions)
+                    self.found_words.append(word)
             self.assign_word_colors_test()
 
             def highlight_next_test(index=0):
@@ -32,7 +36,7 @@ class TestGUI(WordSearchGUI):
     def get_word_at_position_test(self, row, col):
         for word in self.word_search.words:
             positions = self.word_search.find_word(word)
-            if (row, col) in positions:
+            if positions and (row, col) in positions:
                 return word
         return None
 
@@ -70,7 +74,7 @@ class TestGUI(WordSearchGUI):
             label.config(bg='yellow')
             self.highlighted_positions.append((row, col))
 
-        self.check_highlighted_tiles()  # Corrected method name
+        self.check_highlighted_tiles()
 
     def assign_word_colors_test(self):
         highlight_colors = ['orange', 'cyan', 'lightgreen', 'lightblue', 'pink', 'green', 'blue', 'red', 'purple', 'violet', 'brown']
@@ -81,12 +85,45 @@ class TestGUI(WordSearchGUI):
             self.word_colors[word] = highlight_colors[color_index]
 
     def main_test(self):
-        app = TestGUI()
-        app.size_entry.insert(0, "8")
-        app.set_size()
-        app.auto_generate_words()
-        app.highlight_all_word_positions_test()
-        app.mainloop()
+        self.size_entry.insert(0, str(self.grid_size))
+        self.set_size()
+        self.auto_generate_words()
+        self.highlight_all_word_positions_test()
+        self.uncheck_random_word()
+        self.mainloop()
+
+    def uncheck_random_word(self):
+        if self.found_words:
+            word_to_uncheck = random.choice(self.found_words)
+            positions = self.word_search.find_word(word_to_uncheck)
+            if positions:
+                for pos in positions:
+                    row, col = pos
+                    label = self.grid_frame.grid_slaves(row=row, column=col)[0]
+                    self.toggle_highlight_test(None, label)
+                print(f"Unchecked word: {word_to_uncheck}")
+
+def run_test(test_id, size, words):
+    try:
+        gui = TestGUI(size)
+        gui.main_test()
+        return gui.found_words == []
+    except Exception as e:
+        print(f"Test {test_id} failed with exception: {e}")
+        return False
 
 if __name__ == "__main__":
-    TestGUI().main_test()
+    tests = [(size, None) for size in range(3, 28)]
+    successful_tests = []
+    failed_tests = []
+
+    for idx, (size, words) in enumerate(tests, start=1):
+        test_id = f"test{idx}"
+        if run_test(test_id, size, words):
+            successful_tests.append(test_id)
+        else:
+            failed_tests.append(test_id)
+
+    print("\nSummary:")
+    print(f"Successful Tests: {successful_tests}")
+    print(f"Failed Tests: {failed_tests}")
