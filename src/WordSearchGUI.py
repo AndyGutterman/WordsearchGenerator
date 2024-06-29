@@ -5,12 +5,10 @@ from tkinter import messagebox, filedialog
 from WordSearch import WordSearch
 
 
-# todo add size presets
-# todo change color of word to green if found/strikethrough
-
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.add_word_button = None
         self.highlighted_labels = []
         self.highlighted_positions = []
         self.title("Word Search Generator")
@@ -18,9 +16,9 @@ class WordSearchGUI(tk.Tk):
         self.word_search = None
         self.label_frame = None
         self.label_size = None
-        self.add_word_button = None
         self.size_entry = None
         self.size_button = None
+        self.small_button = None
         self.output_text = None
         self.word_entry = None
         self.auto_button = None
@@ -36,7 +34,7 @@ class WordSearchGUI(tk.Tk):
 
         menubar = tk.Menu(self)
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Save as...", command=self.save_file, state=tk.DISABLED)
+        filemenu.add_command(label="Save as...", command=self.save_file, state=tk.DISABLED)  # Initially disabled
         filemenu.add_command(label="Load file", command=self.load_file, state=tk.NORMAL)
         menubar.add_cascade(label="File", menu=filemenu)
         self.config(menu=menubar)
@@ -50,6 +48,10 @@ class WordSearchGUI(tk.Tk):
 
         self.size_button = tk.Button(self.label_frame, text="Set", command=self.set_size)
         self.size_button.pack(side=tk.LEFT)
+
+        self.small_button = tk.Button(self.label_frame, text="Small (6)", command=lambda: self.set_preset_size(6),
+                                      state=tk.NORMAL)
+        self.small_button.pack(side=tk.LEFT, padx=10)
 
         text_and_slider_frame = tk.Frame(self)
         text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
@@ -67,8 +69,75 @@ class WordSearchGUI(tk.Tk):
 
         self.filemenu = filemenu
 
+    def set_size(self, event=None):
+        try:
+            size = int(self.size_entry.get().strip())
+            if size <= 0:
+                messagebox.showerror("Error", "Size must be a positive integer.")
+                return
+            self.lock_size_buttons()
+
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.delete(1.0, tk.END)
+
+            text_height = min(max(size * 3, 10), 30)
+            text_width = min(max(size * 5, 40), 80)
+
+            self.output_text.config(height=text_height, width=text_width)
+
+            self.word_search = WordSearch(size)
+            self.take_words_gui()
+
+            new_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
+            self.output_text.insert(tk.END, new_message + "\n", "center")
+            self.output_text.config(state=tk.DISABLED)
+
+            # Update characters remaining slider properties
+            self.char_slider.config(from_=size * size, to=0, length=text_height * 7)
+            self.update_slider(0)
+
+        except ValueError:
+            messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
+
+    def set_preset_size(self, preset_size):
+        self.size_entry.delete(0, tk.END)
+        self.size_entry.insert(0, str(preset_size))
+        self.set_size()
+
     def load_file(self):
-        print("Load file")
+        self.lock_word_buttons()
+        file_path = filedialog.askopenfilename(
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt")]
+        )
+        if file_path:
+            with open(file_path, 'r') as f:
+                lines = f.readlines()
+
+            grid = []
+            words = []
+            in_wordbank = False
+
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                if line == "WORDBANK":
+                    in_wordbank = True
+                    continue
+                if in_wordbank:
+                    words.append(line.split(" ")[0])
+                else:
+                    grid.append(line.split())
+
+            size = len(grid)
+            self.word_search = WordSearch(size)
+            self.word_search.grid = grid
+            self.word_search.words = words
+            self.show_word_search()
+            self.show_wordbank()
+            messagebox.showinfo("File Loaded", f"Word search loaded from {file_path}")
+
     def save_file(self):
         if not self.word_search:
             messagebox.showerror("Error", "No word search generated yet.")
@@ -91,39 +160,7 @@ class WordSearchGUI(tk.Tk):
 
             messagebox.showinfo("File Saved", f"Word search saved as {file_path}")
 
-
-    def set_size(self, event=None):
-        try:
-            size = int(self.size_entry.get().strip())
-            if size <= 0:
-                messagebox.showerror("Error", "Size must be a positive integer.")
-                return
-            self.size_entry.config(state=tk.DISABLED)
-            self.size_button.config(state=tk.DISABLED)
-
-            self.output_text.config(state=tk.NORMAL)
-            self.output_text.delete(1.0, tk.END)
-
-            text_height = min(max(size * 3, 10), 30)
-            text_width = min(max(size * 5, 40), 80)
-
-            self.output_text.config(height=text_height, width=text_width)
-
-            self.word_search = WordSearch(size)
-            self.take_words_gui()
-
-            new_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
-            self.output_text.insert(tk.END, new_message + "\n", "center")
-            self.output_text.config(state=tk.DISABLED)
-
-            # Update characters remaining slider properties
-            self.char_slider.config(from_=0, to=size * size, length=text_height * 7)
-            self.update_characters_remaining(size * size)
-
-        except ValueError:
-            messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
-
-    def update_characters_remaining(self, remaining):
+    def update_slider(self, remaining):
         self.char_slider.config(state=tk.NORMAL)
         self.char_slider.set(remaining)
         self.char_slider.config(state=tk.DISABLED)
@@ -178,12 +215,22 @@ class WordSearchGUI(tk.Tk):
             self.word_entry.delete(0, 'end')
             self.add_word_button.config(state=tk.NORMAL)
 
-    def create(self):
+    def lock_size_buttons(self):
+        self.size_entry.config(state=tk.DISABLED)
+        self.size_button.config(state=tk.DISABLED)
+        self.small_button.config(state=tk.DISABLED)
+
+    def lock_word_buttons(self):
         self.auto_button.config(state=tk.DISABLED)
         self.done_button.config(state=tk.DISABLED)
         self.add_word_button.config(state=tk.DISABLED)
         self.word_entry.config(state=tk.DISABLED)
 
+    def create(self):
+        self.auto_button.config(state=tk.DISABLED)
+        self.done_button.config(state=tk.DISABLED)
+        self.add_word_button.config(state=tk.DISABLED)
+        self.word_entry.config(state=tk.DISABLED)
         self.filemenu.entryconfig("Save as...", state=tk.NORMAL)
 
         self.word_search.place_words()
@@ -204,7 +251,7 @@ class WordSearchGUI(tk.Tk):
             remaining_spaces = self.word_search.size * self.word_search.size - sum(
                 len(w) for w in self.word_search.words)
             self.update_output_text(f"Added {word}, {remaining_spaces} characters left")
-            self.update_characters_remaining(remaining_spaces)
+            self.update_slider(self.word_search.size ** 2 - remaining_spaces)
             if remaining_spaces <= (1 / 4 * self.word_search.size * self.word_search.size):
                 self.update_output_text(f"** Note: Grid nearly full **")
             if remaining_spaces <= (1 / 8 * self.word_search.size * self.word_search.size):
@@ -358,9 +405,11 @@ class WordSearchGUI(tk.Tk):
         # Apply strike-through only to found words
         self.strike_through_output_text(found_words)
 
+
 def main():
     app = WordSearchGUI()
     app.mainloop()
+
 
 if __name__ == "__main__":
     main()
