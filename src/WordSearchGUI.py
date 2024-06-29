@@ -36,8 +36,9 @@ class WordSearchGUI(tk.Tk):
 
         menubar = tk.Menu(self)
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Save as...", command=self.save_file, state=tk.DISABLED)  # Disabled initially
-        menubar.add_cascade(label="Save", menu=filemenu)
+        filemenu.add_command(label="Save as...", command=self.save_file, state=tk.DISABLED)
+        filemenu.add_command(label="Load file", command=self.load_file, state=tk.NORMAL)
+        menubar.add_cascade(label="File", menu=filemenu)
         self.config(menu=menubar)
 
         self.label_size = tk.Label(self.label_frame, text="Enter grid size:")
@@ -66,6 +67,8 @@ class WordSearchGUI(tk.Tk):
 
         self.filemenu = filemenu
 
+    def load_file(self):
+        print("Load file")
     def save_file(self):
         if not self.word_search:
             messagebox.showerror("Error", "No word search generated yet.")
