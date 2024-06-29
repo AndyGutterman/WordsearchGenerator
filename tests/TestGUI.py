@@ -85,7 +85,7 @@ class TestGUI(WordSearchGUI):
             self.word_colors[word] = highlight_colors[color_index]
 
     def main_test(self):
-        self.size_entry.insert(0, str(self.grid_size))
+        self.set_size_entry.insert(0, str(self.grid_size))
         self.set_size()
         self.auto_generate_words()
         self.highlight_all_word_positions_test()
