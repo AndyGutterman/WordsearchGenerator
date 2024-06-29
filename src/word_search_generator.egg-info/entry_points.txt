@@ -1,3 +1,0 @@
-[console_scripts]
-wordsearchCLI = WordSearch:main
-wordsearchGUI = WordSearchGUI:main
