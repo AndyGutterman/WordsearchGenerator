@@ -2,8 +2,8 @@ import math
 import os
 import tkinter as tk
 from tkinter import messagebox, filedialog
+from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
-
 
 class WordSearchGUI(tk.Tk):
     def __init__(self):
@@ -233,7 +233,7 @@ class WordSearchGUI(tk.Tk):
         self.word_entry.config(state=tk.DISABLED)
         self.filemenu.entryconfig("Save as...", state=tk.NORMAL)
 
-        self.word_search.place_words()
+        WordPlacer.place_words(self.word_search)
         self.word_search.fill_grid()
         self.show_word_search()
         self.show_wordbank()
