@@ -1,6 +1,6 @@
 import os
 import random
-from WordPlacer import WordPlacer
+from placement.WordPlacer import WordPlacer
 
 class WordSearch:
     def __init__(self, size=None):
@@ -70,43 +70,7 @@ class WordSearch:
             print(f"Error: File '{wordlist_path}' not found.")
             return None
 
-    def place_words(self):
-        self.words.sort(key=len, reverse=True)
-        max_spaces = self.size ** 2
-        big_words_count = sum(1 for word in self.words if len(word) == self.size)
-        current_grid_state = [row[:] for row in self.grid]
-        try:
-            for word in self.words:
-                if word in self.word_locations:
-                    continue
-                letters = list(word)
-                placed = False
-                attempts = 0
-                max_attempts = 1000
-                while not placed and attempts < max_attempts:
-                    if big_words_count >= 1:
-                        r = random.randint(1, 2)
-                    else:
-                        r = random.randint(1, 4)    # 3 and 4 both diagonal
-                    if r == 1:
-                        direction = "vertical"
-                    elif r == 2:
-                        direction = "horizontal"
-                    elif r == 3 or r == 4:
-                        direction = "diagonal"
-                    placed = WordPlacer.place(self, letters, max_spaces, direction)
-                    if placed:
-                        big_words_count -= 1
-                        self.word_locations.setdefault(tuple(letters), [])
-                        attempts = 0
-                    else:
-                        attempts += 1
-                if not placed:
-                    print(f"Failed to place word '{word}' after {max_attempts} attempts.")
 
-        except Exception as e:
-            print(f"Error occurred during word placement: {e}")
-            self.grid = current_grid_state  # Revert to previous grid state
 
     def fill_grid(self):
         for row in self.grid:
@@ -191,12 +155,21 @@ def customize():
 
 def main():
     word_search = customize()
-    word_search.place_words()
+    WordPlacer.place_words(word_search)
     word_search.fill_grid()
     word_search.show_grid()
     word_search.show_wordbank()
-    word_search.txt_print()
-    word_search.print_word_locations()
+
+    print("Save as text file? (y/n)\n>>>")
+    show_output = input().strip().upper()
+    if show_output == 'Y':
+        word_search.txt_print()
+
+    print("See answers?   (y/n)\n>>>")
+    show_output = input().strip().upper()
+    if show_output == 'Y':
+        word_search.print_word_locations()
+
 
 if __name__ == "__main__":
     main()
