@@ -105,7 +105,6 @@ class WordSearchGUI(tk.Tk):
         self.set_size()
 
     def load_file(self):
-        self.lock_word_buttons()
         file_path = filedialog.askopenfilename(
             defaultextension=".txt",
             filetypes=[("Text files", "*.txt")]
@@ -137,6 +136,8 @@ class WordSearchGUI(tk.Tk):
             self.show_word_search()
             self.show_wordbank()
             messagebox.showinfo("File Loaded", f"Word search loaded from {file_path}")
+            self.lock_size_buttons()
+            self.lock_word_buttons()
 
     def save_file(self):
         if not self.word_search:
