@@ -2,7 +2,6 @@ import os
 import random
 from WordPlacer import WordPlacer
 
-
 class WordSearch:
     def __init__(self, size=None):
         self.size = size
@@ -34,22 +33,26 @@ class WordSearch:
 
     def generate_words(self, spaces_remaining):
         current_density = (self.size * self.size - spaces_remaining) / (self.size * self.size)
-        desired_density = 0.75
+        desired_density = 0.5 + 0.25 * (self.size / 30)
         spaces_to_generate = int((desired_density - current_density) * self.size * self.size)
 
         if spaces_to_generate <= 0:
             return
 
-        min_word_size = 3 if self.size > 3 else 1
+        # Adjust max word length based on grid size
+        max_word_length = min(self.size, 22)
 
         while spaces_to_generate > 0:
+            min_word_size = 3 if self.size >= 3 else (1 if self.size == 1 else 2)
             if spaces_to_generate < min_word_size:
                 break
 
-            word_length = random.randint(min_word_size, min(self.size, spaces_to_generate, 22))
+            # Randomly select a word length within the adjusted limits
+            word_length = random.randint(min_word_size, min(max_word_length, spaces_to_generate))
             word = self.generate_word(word_length)
-            self.words.append(word)
-            spaces_to_generate -= len(word)
+            if word:
+                self.words.append(word)
+                spaces_to_generate -= len(word)
 
             if spaces_remaining <= 0:
                 break
@@ -61,7 +64,7 @@ class WordSearch:
             with open(wordlist_path, 'r') as f:
                 all_words = f.read().splitlines()
                 cleaned_words = [word.replace('-', '').replace("'", '').upper() for word in all_words]
-                filtered_words = [word for word in cleaned_words if len(word) == length]
+                filtered_words = [word for word in cleaned_words if len(word) == length and word not in self.words]
                 return random.choice(filtered_words) if filtered_words else None
         except FileNotFoundError:
             print(f"Error: File '{wordlist_path}' not found.")
@@ -79,17 +82,17 @@ class WordSearch:
                 letters = list(word)
                 placed = False
                 attempts = 0
-                max_attempts = 10
+                max_attempts = 1000
                 while not placed and attempts < max_attempts:
                     if big_words_count >= 1:
                         r = random.randint(1, 2)
                     else:
-                        r = random.randint(1, 3)
+                        r = random.randint(1, 4)    # 3 and 4 both diagonal
                     if r == 1:
                         direction = "vertical"
                     elif r == 2:
                         direction = "horizontal"
-                    elif r == 3:
+                    elif r == 3 or r == 4:
                         direction = "diagonal"
                     placed = WordPlacer.place(self, letters, max_spaces, direction)
                     if placed:
@@ -155,10 +158,10 @@ class WordSearch:
     def find_word(self, word):
         word_length = len(word)
         directions = [
-            (0, 1),  # horizontal
-            (1, 0),  # vertical
-            (1, 1),  # diagonal \
-            (-1, 1)  # diagonal /
+            (0, 1),    # horizontal
+            (1, 0),    # vertical
+            (1, 1),    # diagonal \
+            (-1, 1)    # diagonal /
         ]
         found_positions = []
         for row in range(self.size):
@@ -194,3 +197,6 @@ def main():
     word_search.show_wordbank()
     word_search.txt_print()
     word_search.print_word_locations()
+
+if __name__ == "__main__":
+    main()
