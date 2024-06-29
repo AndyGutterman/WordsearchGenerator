@@ -1,7 +1,7 @@
 # Word Search Generator
 
-- This application allows users to create and solve custom word search puzzles of varying sizes.
-- Now featuring automatic generation options and file output to save previous puzzles.
+- This program allows users to create and solve custom word search puzzles of varying sizes.
+- Automatic generation options and file output to save previous puzzles (.txt files)
 
 
 ### Key Features
@@ -9,15 +9,14 @@
 - **Scalable Grid:** Customize grid size to suit different puzzle complexities.
 - **Interactive Interface:** User-friendly GUI that visualizes the generated puzzle and word bank.
 
-## Installation 
-1. Clone directory
-2. Install using `pip install -e`
-3. Use a command to start the program:
+## Installation
+1. Clone directory: `git clone git@github.com:AndyGutterman/WordsearchGenerator.git`
+2. Navigate using `cd path/to/WordsearchGenerator`
+3. Install using `pip install -e .`
 
-| Enter command    | desired version: |
-|:-----------------|:----------------:|
-| `wordsearchGUI`  |  Wordsearch GUI  |
-| `wordsearchCLI ` |  Wordsearch CLI  |
+## How To Use
+   - Launch anywhere using `wordsearchGUI` 
+   - Alternatively, launch the command line version:  `wordsearchCLI` 
 
 
 ## Requirements
