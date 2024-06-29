@@ -1,8 +1,12 @@
 import math
+import os
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from WordSearch import WordSearch
 
+
+# todo add size presets
+# todo change color of word to green if found/strikethrough
 
 class WordSearchGUI(tk.Tk):
     def __init__(self):
@@ -10,6 +14,7 @@ class WordSearchGUI(tk.Tk):
         self.highlighted_labels = []
         self.highlighted_positions = []
         self.title("Word Search Generator")
+        self.filemenu = None
         self.word_search = None
         self.label_frame = None
         self.label_size = None
@@ -29,6 +34,12 @@ class WordSearchGUI(tk.Tk):
         self.label_frame = tk.Frame(self, pady=10)
         self.label_frame.pack()
 
+        menubar = tk.Menu(self)
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Save as...", command=self.save_file, state=tk.DISABLED)  # Disabled initially
+        menubar.add_cascade(label="Save", menu=filemenu)
+        self.config(menu=menubar)
+
         self.label_size = tk.Label(self.label_frame, text="Enter grid size:")
         self.label_size.pack(side=tk.LEFT, padx=(0, 20))
 
@@ -42,7 +53,6 @@ class WordSearchGUI(tk.Tk):
         text_and_slider_frame = tk.Frame(self)
         text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
 
-        # Initialize output text
         self.output_text = tk.Text(text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
         self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         self.output_text.tag_configure("center", justify='center')
@@ -50,10 +60,34 @@ class WordSearchGUI(tk.Tk):
         initial_message = "\n\n\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
 
-        # Initialize slider
         self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
         self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        self.char_slider.configure(state=tk.DISABLED)  # Disable slider
+        self.char_slider.configure(state=tk.DISABLED)
+
+        self.filemenu = filemenu
+
+    def save_file(self):
+        if not self.word_search:
+            messagebox.showerror("Error", "No word search generated yet.")
+            return
+
+        initial_dir = os.path.abspath(os.path.dirname(__file__))  # Get current script directory
+        file_path = filedialog.asksaveasfilename(
+            initialdir=initial_dir,
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt")]
+        )
+
+        if file_path:
+            with open(file_path, 'w') as f:
+                for row in self.word_search.grid:
+                    f.write(' '.join(row) + '\n')
+                f.write('\nWORDBANK\n')
+                for word in self.word_search.words:
+                    f.write(word + '\n')
+
+            messagebox.showinfo("File Saved", f"Word search saved as {file_path}")
+
 
     def set_size(self, event=None):
         try:
@@ -147,11 +181,12 @@ class WordSearchGUI(tk.Tk):
         self.add_word_button.config(state=tk.DISABLED)
         self.word_entry.config(state=tk.DISABLED)
 
+        self.filemenu.entryconfig("Save as...", state=tk.NORMAL)
+
         self.word_search.place_words()
         self.word_search.fill_grid()
         self.show_word_search()
         self.show_wordbank()
-        # self.word_search.print_word_locations()
 
     def add_word(self, event=None):
         word = self.word_entry.get().strip().upper()
@@ -212,13 +247,8 @@ class WordSearchGUI(tk.Tk):
         label = event.widget
         letter = label.cget("text")
 
-        # Toggle highlighting of the label
         self.highlight_label(label)
-
-        # Print highlighted labels for debugging
         self.print_highlighted_labels()
-
-        # Check if highlighted labels form any valid word
         self.check_highlighted_tiles()
 
     def highlight_label(self, label):
@@ -325,7 +355,9 @@ class WordSearchGUI(tk.Tk):
         # Apply strike-through only to found words
         self.strike_through_output_text(found_words)
 
-
 def main():
     app = WordSearchGUI()
     app.mainloop()
+
+if __name__ == "__main__":
+    main()
