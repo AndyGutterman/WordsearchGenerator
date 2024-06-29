@@ -4,6 +4,10 @@ from tkinter import messagebox
 from WordSearch import WordSearch
 
 
+# todo add save button, file output to gui
+# todo add size presets
+# todo change color of word to green if found/strikethrough
+
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
