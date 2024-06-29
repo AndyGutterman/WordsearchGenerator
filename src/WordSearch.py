@@ -71,8 +71,6 @@ class WordSearch:
         self.words.sort(key=len, reverse=True)
         max_spaces = self.size ** 2
         big_words_count = sum(1 for word in self.words if len(word) == self.size)
-        print(f"Number of words as big as the grid size ({self.size}): {big_words_count}")
-        r_big = random.randint(1, 2)
         current_grid_state = [row[:] for row in self.grid]
         try:
             for word in self.words:
@@ -80,21 +78,28 @@ class WordSearch:
                     continue
                 letters = list(word)
                 placed = False
-                while not placed:
+                attempts = 0
+                max_attempts = 10
+                while not placed and attempts < max_attempts:
                     if big_words_count >= 1:
-                        r = r_big
+                        r = random.randint(1, 2)
                     else:
                         r = random.randint(1, 3)
                     if r == 1:
-                        placed = WordPlacer.place(self, letters, max_spaces, direction="vertical")
+                        direction = "vertical"
                     elif r == 2:
-                        placed = WordPlacer.place(self, letters, max_spaces, direction="horizontal")
+                        direction = "horizontal"
                     elif r == 3:
-                        placed = WordPlacer.place(self, letters, max_spaces, direction="diagonal")
-
-                if placed:
-                    big_words_count -= 1
-                    self.word_locations.setdefault(tuple(letters), [])
+                        direction = "diagonal"
+                    placed = WordPlacer.place(self, letters, max_spaces, direction)
+                    if placed:
+                        big_words_count -= 1
+                        self.word_locations.setdefault(tuple(letters), [])
+                        attempts = 0
+                    else:
+                        attempts += 1
+                if not placed:
+                    print(f"Failed to place word '{word}' after {max_attempts} attempts.")
 
         except Exception as e:
             print(f"Error occurred during word placement: {e}")
