@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 
 
 def initialize_gui(self):
@@ -44,24 +43,69 @@ def initialize_gui(self):
                                           command=lambda: self.set_preset_size(16), state=tk.NORMAL)
             self.large_button.pack(side=tk.LEFT, padx=0.25)
             self.large_button.bind("<Return>", lambda event: self.set_preset_size(16))
+
         custom_size_elements()
         preset_size_buttons()
 
     def initialize_output_and_slider_frame():
-        text_and_slider_frame = tk.Frame(self)
-        text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
+        output_text_and_slider_frame = tk.Frame(self)
+        output_text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
 
-        self.output_text = tk.Text(text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
+        self.output_text = tk.Text(output_text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
         self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         self.output_text.tag_configure("center", justify='center')
 
         initial_message = "\n\n\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
-
-        self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
+        self.char_slider = tk.Scale(output_text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
         self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
         self.char_slider.configure(state=tk.DISABLED)
 
     initialize_menubar()
     initialize_size_elements()
     initialize_output_and_slider_frame()
+
+
+def initialize_buttons(self):
+    button_frame = tk.Frame(self)
+    button_frame.pack()
+    self.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=self.auto_generate_words)
+    self.auto_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
+    self.auto_button.bind("<Return>", lambda event: self.auto_generate_words())
+
+    self.done_button = tk.Button(button_frame, text="Done", fg='green', command=self.create)
+    self.done_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
+
+    self.add_word_entry = tk.Entry(button_frame, justify='center')
+    self.add_word_entry.insert(0, 'click to enter word')
+    self.add_word_entry.bind("<FocusIn>", self.on_word_entry_focus)
+    self.add_word_entry.pack(side=tk.LEFT, padx=(10, 5), pady=10)
+    self.add_word_entry.bind("<Return>", self.add_word)
+
+    self.add_word_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
+    self.add_word_button.config(state=tk.DISABLED)
+    self.add_word_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
+
+
+def update_output_text(self, new_content):
+    current_content = self.output_text.get(1.0, tk.END)
+    if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
+        self.output_text.config(state=tk.NORMAL)
+        self.output_text.delete(1.0, tk.END)
+        self.output_text.config(state=tk.DISABLED)
+
+    self.output_text.config(state=tk.NORMAL)
+
+    if "word bank" in new_content:
+        start_index = 1.0
+        while True:
+            start_index = self.output_text.search("word bank", start_index, tk.END)
+            if not start_index:
+                break
+            end_index = f"{start_index}+{len('word bank')}c"
+            self.output_text.tag_add("strike", start_index, end_index)
+            start_index = end_index
+
+    self.output_text.insert(tk.END, new_content + "\n", "center")
+    self.output_text.config(state=tk.DISABLED)
+
