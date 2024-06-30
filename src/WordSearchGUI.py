@@ -112,7 +112,6 @@ class WordSearchGUI(tk.Tk):
             self.update_word_buttons_state(False)
             self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
 
-
     def save_file(self):
         if not self.word_search:
             messagebox.showerror("Error", "No word search generated yet.")
@@ -369,3 +368,7 @@ class WordSearchGUI(tk.Tk):
 def main():
     app = WordSearchGUI()
     app.mainloop()
+
+
+if __name__ == "__main__":
+    main()

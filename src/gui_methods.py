@@ -121,6 +121,12 @@ def update_output_text(self, new_content):
     self.output_text.config(state=tk.DISABLED)
 
 
+def update_character_fill_indicator(self, remaining):
+    self.character_fill_indicator.config(state=tk.NORMAL)
+    self.character_fill_indicator.set(remaining)
+    self.character_fill_indicator.config(state=tk.DISABLED)
+
+
 def initialize_word_entry_buttons(self):
     button_frame = tk.Frame(self)
     button_frame.pack()
@@ -140,3 +146,4 @@ def initialize_word_entry_buttons(self):
     self.word_add_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
     self.word_add_button.config(state=tk.DISABLED)
     self.word_add_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
+
