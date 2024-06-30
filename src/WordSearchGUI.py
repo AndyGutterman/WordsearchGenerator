@@ -3,7 +3,7 @@ import os
 import tkinter as tk
 from tkinter import messagebox, filedialog
 
-from gui_initialization import initialize_gui
+from gui_methods import initialize_gui, initialize_buttons, update_output_text
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
 
@@ -40,8 +40,7 @@ class WordSearchGUI(tk.Tk):
             if size <= 0:
                 messagebox.showerror("Error", "Size must be a positive integer.")
                 return
-            self.lock_size_buttons()
-
+            self.update_size_buttons_state(False)
             self.output_text.config(state=tk.NORMAL)
             self.output_text.delete(1.0, tk.END)
 
@@ -51,7 +50,7 @@ class WordSearchGUI(tk.Tk):
             self.output_text.config(height=text_height, width=text_width)
 
             self.word_search = WordSearch(size)
-            self.take_words_gui()
+            self.update_word_entry_buttons()
 
             new_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
             self.output_text.insert(tk.END, new_message + "\n", "center")
@@ -60,6 +59,8 @@ class WordSearchGUI(tk.Tk):
             # Update characters remaining slider properties
             self.char_slider.config(from_=size * size, to=0, length=text_height * 7)
             self.update_slider(0)
+            self.unlock_word_buttons()
+
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
@@ -101,7 +102,7 @@ class WordSearchGUI(tk.Tk):
             self.show_word_search()
             self.show_wordbank()
             messagebox.showinfo("File Loaded", f"Word search loaded from {file_path}")
-            self.lock_size_buttons()
+            self.update_size_buttons_state(False)
             self.lock_word_buttons()
 
     def save_file(self):
@@ -131,55 +132,11 @@ class WordSearchGUI(tk.Tk):
         self.char_slider.set(remaining)
         self.char_slider.config(state=tk.DISABLED)
 
-    def update_output_text(self, new_content):
-        current_content = self.output_text.get(1.0, tk.END)
-
-        if "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished" in current_content:
-            self.output_text.config(state=tk.NORMAL)
-            self.output_text.delete(1.0, tk.END)
-            self.output_text.config(state=tk.DISABLED)
-
-        self.output_text.config(state=tk.NORMAL)
-
-        if "word bank" in new_content:
-            # Apply strikethrough to parts containing "word bank"
-            start_index = 1.0
-            while True:
-                start_index = self.output_text.search("word bank", start_index, tk.END)
-                if not start_index:
-                    break
-                end_index = f"{start_index}+{len('word bank')}c"
-                self.output_text.tag_add("strike", start_index, end_index)
-                start_index = end_index
-
-        self.output_text.insert(tk.END, new_content + "\n", "center")
-        self.output_text.config(state=tk.DISABLED)
-
-    def initialize_buttons(self, button_frame):
-        self.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=self.auto_generate_words)
-        self.auto_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
-        self.auto_button.bind("<Return>", lambda event: self.auto_generate_words())
-
-        self.done_button = tk.Button(button_frame, text="Done", fg='green', command=self.create)
-        self.done_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
-
-        self.add_word_entry = tk.Entry(button_frame, justify='center')
-        self.add_word_entry.insert(0, 'click to enter word')
-        self.add_word_entry.bind("<FocusIn>", self.on_word_entry_focus)
-        self.add_word_entry.pack(side=tk.LEFT, padx=(10, 5), pady=10)
-        self.add_word_entry.bind("<Return>", self.add_word)
-
-        self.add_word_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
-        self.add_word_button.config(state=tk.DISABLED)
-        self.add_word_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
-
-    def take_words_gui(self):
-        button_frame = tk.Frame(self)
-        button_frame.pack()
+    def update_word_entry_buttons(self):
         if self.GUI_already_initialized:
             self.unlock_word_buttons()
         else:
-            self.initialize_buttons(button_frame)
+            initialize_buttons(self)
             self.GUI_already_initialized = True
 
     def on_word_entry_focus(self, event):
@@ -195,9 +152,10 @@ class WordSearchGUI(tk.Tk):
         self.large_button.config(state=tk.DISABLED)
 
     def reset(self):
-        self.unlock_size_buttons()
+        self.update_size_buttons_state(True)
         self.word_search = None
         self.set_size_entry.delete(0, 'end')
+        self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
 
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
@@ -228,19 +186,13 @@ class WordSearchGUI(tk.Tk):
             self.grid_window.destroy()
             self.grid_window = None
 
-    def lock_size_buttons(self):
-        self.set_size_entry.config(state=tk.DISABLED)
-        self.set_size_button.config(state=tk.DISABLED)
-        self.small_button.config(state=tk.DISABLED)
-        self.medium_button.config(state=tk.DISABLED)
-        self.large_button.config(state=tk.DISABLED)
-
-    def unlock_size_buttons(self):
-        self.set_size_entry.config(state=tk.NORMAL)
-        self.set_size_button.config(state=tk.NORMAL)
-        self.small_button.config(state=tk.NORMAL)
-        self.medium_button.config(state=tk.NORMAL)
-        self.large_button.config(state=tk.NORMAL)
+    def update_size_buttons_state(self, enabled):
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.set_size_entry.config(state=state)
+        self.set_size_button.config(state=state)
+        self.small_button.config(state=state)
+        self.medium_button.config(state=state)
+        self.large_button.config(state=state)
 
     def lock_word_buttons(self):
         self.auto_button.config(state=tk.DISABLED)
@@ -260,7 +212,6 @@ class WordSearchGUI(tk.Tk):
         self.add_word_button.config(state=tk.DISABLED)
         self.add_word_entry.config(state=tk.DISABLED)
         self.filemenu.entryconfig("Save as...", state=tk.NORMAL)
-
         WordPlacer.place_words(self.word_search)
         self.word_search.fill_grid()
         self.show_word_search()
@@ -278,12 +229,12 @@ class WordSearchGUI(tk.Tk):
             self.word_search.words.append(word)
             remaining_spaces = self.word_search.size * self.word_search.size - sum(
                 len(w) for w in self.word_search.words)
-            self.update_output_text(f"Added {word}, {remaining_spaces} characters left")
+            update_output_text(self, f"Added {word}, {remaining_spaces} characters left")
             self.update_slider(self.word_search.size ** 2 - remaining_spaces)
             if remaining_spaces <= (1 / 4 * self.word_search.size * self.word_search.size):
-                self.update_output_text(f"** Note: Grid nearly full **")
+                update_output_text(self, f"** Note: Grid nearly full **")
             if remaining_spaces <= (1 / 8 * self.word_search.size * self.word_search.size):
-                self.update_output_text(f"** Warning: grid space very low - may not generate **")
+                update_output_text(self, f"** Warning: grid space very low - may not generate **")
             if remaining_spaces <= 0:
                 self.create()
         else:
@@ -394,7 +345,7 @@ class WordSearchGUI(tk.Tk):
     def show_wordbank(self):
         word_bank = self.word_search.words
         if not word_bank:
-            self.update_output_text("Word Bank is empty.")
+            update_output_text(self, "Word Bank is empty.")
         else:
             max_word_length = max(len(word) for word in word_bank)
             output_width = self.output_text.cget('width')
@@ -432,6 +383,7 @@ class WordSearchGUI(tk.Tk):
 
         # Apply strike-through only to found words
         self.strike_through_output_text(found_words)
+        update_output_text(self, "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished")
 
 
 def main():
