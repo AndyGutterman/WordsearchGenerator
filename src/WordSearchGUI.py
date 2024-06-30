@@ -3,7 +3,8 @@ import os
 import tkinter as tk
 from tkinter import messagebox, filedialog
 
-from gui_methods import initialize_gui, initialize_word_entry_buttons, update_output_text, get_size_from_entry, \
+from FileOutputHandler import FileOutputHandler
+from LoadGUI import initialize_base_UI_elements, initialize_word_entry_buttons, get_size_from_entry, \
     configure_output_text
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
@@ -12,6 +13,7 @@ from WordSearch import WordSearch
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+
         self.GUI_already_initialized = False
         self.highlighted_labels = []
         self.highlighted_positions = []
@@ -33,7 +35,8 @@ class WordSearchGUI(tk.Tk):
         self.grid_frame = None
         self.grid_window = None
         self.character_fill_indicator = None
-        initialize_gui(self)
+        initialize_base_UI_elements(self)
+        self.file_handler = FileOutputHandler(self)
 
     def set_size(self, event=None, preset_size=None):
         try:
@@ -46,6 +49,7 @@ class WordSearchGUI(tk.Tk):
                 size = preset_size
 
             configure_output_text(self.output_text, size)
+
             self.initialize_word_search(size)
             self.update_ui_after_size_change(size)
 
@@ -63,7 +67,6 @@ class WordSearchGUI(tk.Tk):
         self.size_set_entry.config(state=tk.DISABLED)
 
     def update_ui_before_size_change(self):
-        self.update_size_buttons_state(False)
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
 
@@ -77,62 +80,10 @@ class WordSearchGUI(tk.Tk):
         self.update_word_buttons_state(True)
 
     def load_file(self):
-        file_path = filedialog.askopenfilename(
-            defaultextension=".txt",
-            filetypes=[("Text files", "*.txt")]
-        )
-        if file_path:
-            with open(file_path, 'r') as f:
-                lines = f.readlines()
-
-            grid = []
-            words = []
-            in_wordbank = False
-
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    continue
-                if line == "WORDBANK":
-                    in_wordbank = True
-                    continue
-                if in_wordbank:
-                    words.append(line.split(" ")[0])
-                else:
-                    grid.append(line.split())
-
-            size = len(grid)
-            self.word_search = WordSearch(size)
-            self.word_search.grid = grid
-            self.word_search.words = words
-            self.show_word_search()
-            self.show_wordbank()
-            messagebox.showinfo("File Loaded", f"Word search loaded from {file_path}")
-            self.update_size_buttons_state(False)
-            self.update_word_buttons_state(False)
-            self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
+        self.file_handler.load_file()
 
     def save_file(self):
-        if not self.word_search:
-            messagebox.showerror("Error", "No word search generated yet.")
-            return
-
-        initial_dir = os.path.abspath(os.path.dirname(__file__))  # Get current script directory
-        file_path = filedialog.asksaveasfilename(
-            initialdir=initial_dir,
-            defaultextension=".txt",
-            filetypes=[("Text files", "*.txt")]
-        )
-
-        if file_path:
-            with open(file_path, 'w') as f:
-                for row in self.word_search.grid:
-                    f.write(' '.join(row) + '\n')
-                f.write('\nWORDBANK\n')
-                for word in self.word_search.words:
-                    f.write(word + '\n')
-
-            messagebox.showinfo("File Saved", f"Word search saved as {file_path}")
+        self.file_handler.save_file()
 
     def update_character_fill_indicator(self, remaining):
         self.character_fill_indicator.config(state=tk.NORMAL)
@@ -212,12 +163,15 @@ class WordSearchGUI(tk.Tk):
             self.word_search.words.append(word)
             remaining_spaces = self.word_search.size * self.word_search.size - sum(
                 len(w) for w in self.word_search.words)
-            update_output_text(self, f"Added {word}, {remaining_spaces} characters left")
+            confirmation_message = f"Added {word}, {remaining_spaces} characters left"
+            self.update_output_text(confirmation_message)
             self.update_character_fill_indicator(self.word_search.size ** 2 - remaining_spaces)
             if remaining_spaces <= (1 / 4 * self.word_search.size * self.word_search.size):
-                update_output_text(self, f"** Note: Grid nearly full **")
+                grid_near_full_warning = f"** Note: Grid nearly full **"
+                self.update_output_text(grid_near_full_warning)
             if remaining_spaces <= (1 / 8 * self.word_search.size * self.word_search.size):
-                update_output_text(self, f"** Warning: grid space very low - may not generate **")
+                grid_critically_full_warning = f"** Warning: grid space very low - may not generate **"
+                self.update_output_text(grid_critically_full_warning)
             if remaining_spaces <= 0:
                 self.create()
         else:
@@ -238,8 +192,10 @@ class WordSearchGUI(tk.Tk):
         self.filemenu.entryconfig("Save as...", state=tk.NORMAL)
         WordPlacer.place_words(self.word_search)
         self.word_search.fill_grid()
+        self.output_text.config(state=tk.NORMAL)
         self.show_word_search()
         self.show_wordbank()
+        self.track_found_words()
 
     def show_word_search(self):
         if self.grid_frame:
@@ -265,10 +221,34 @@ class WordSearchGUI(tk.Tk):
                 label.grid(row=r, column=c)
                 label.bind("<Button-1>", self.on_label_click)
 
+    def update_output_text(self, new_content):
+        current_content = self.output_text.get(1.0, tk.END)
+        word_entry_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
+        if word_entry_message in current_content:
+            self.output_text.config(state=tk.NORMAL)
+            self.output_text.delete(1.0, tk.END)
+            self.output_text.config(state=tk.DISABLED)
+
+        self.output_text.config(state=tk.NORMAL)
+
+        if "word bank" in new_content:
+            start_index = 1.0
+            while True:
+                start_index = self.output_text.search("word bank", start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len('word bank')}c"
+                self.output_text.tag_add("strike", start_index, end_index)
+                start_index = end_index
+
+        self.output_text.insert(tk.END, new_content + "\n", "center")
+        self.output_text.config(state=tk.DISABLED)
+
     def show_wordbank(self):
         word_bank = self.word_search.words
         if not word_bank:
-            update_output_text(self, "Word Bank is empty.")
+            empty_wordbank_message = "Word Bank is empty."
+            self.update_output_text(empty_wordbank_message)
         else:
             max_word_length = max(len(word) for word in word_bank)
             output_width = self.output_text.cget('width')
@@ -293,7 +273,7 @@ class WordSearchGUI(tk.Tk):
         if self.character_fill_indicator:
             self.character_fill_indicator.pack_forget()
 
-        # Get the found words from check_highlighted_tiles
+    def track_found_words(self):
         found_words = []
         for word in self.word_search.words:
             positions = self.word_search.find_word(word)
@@ -303,10 +283,23 @@ class WordSearchGUI(tk.Tk):
                 if word_positions_set.issubset(highlighted_positions_set):
                     found_words.append(word)
         print("Found words:", found_words)
-
-        # Apply strike-through only to found words
         self.strike_through_output_text(found_words)
-        update_output_text(self, "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished")
+
+    def strike_through_output_text(self, found_words):
+        # Remove strike-through from all text first
+        self.output_text.tag_remove("strike", "1.0", tk.END)
+
+        # Add strike-through only to found words
+        for word in found_words:
+            start_index = "1.0"
+            while True:
+                start_index = self.output_text.search(word, start_index, tk.END)
+                if not start_index:
+                    break
+                end_index = f"{start_index}+{len(word)}c"
+                self.output_text.tag_configure("strike", overstrike=True)
+                self.output_text.tag_add("strike", start_index, end_index)
+                start_index = end_index
 
     def on_label_click(self, event):
         label = event.widget
@@ -347,21 +340,7 @@ class WordSearchGUI(tk.Tk):
         print("Found words:", found_words)
         self.strike_through_output_text(found_words)
 
-    def strike_through_output_text(self, found_words):
-        # Remove strike-through from all text first
-        self.output_text.tag_remove("strike", "1.0", tk.END)
 
-        # Add strike-through only to found words
-        for word in found_words:
-            start_index = "1.0"
-            while True:
-                start_index = self.output_text.search(word, start_index, tk.END)
-                if not start_index:
-                    break
-                end_index = f"{start_index}+{len(word)}c"
-                self.output_text.tag_configure("strike", overstrike=True)
-                self.output_text.tag_add("strike", start_index, end_index)
-                start_index = end_index
 
 
 def main():
