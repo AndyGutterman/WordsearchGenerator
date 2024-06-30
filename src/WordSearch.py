@@ -170,6 +170,3 @@ def main():
     if show_output == 'Y':
         word_search.print_word_locations()
 
-
-if __name__ == "__main__":
-    main()
