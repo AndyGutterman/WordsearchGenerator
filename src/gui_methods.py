@@ -66,7 +66,7 @@ def initialize_gui(self):
         initial_message = "\n\n\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
         self.character_fill_indicator = tk.Scale(
-            output_text_and_fill_indicator_frame, from_=0, to=0, orient=tk.VERTICAL)
+            output_text_and_fill_indicator_frame, from_=1, to=0, orient=tk.VERTICAL)
         self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
         self.character_fill_indicator.configure(state=tk.DISABLED)
 
@@ -121,8 +121,6 @@ def update_output_text(self, new_content):
     self.output_text.config(state=tk.DISABLED)
 
 
-
-
 def initialize_word_entry_buttons(self):
     button_frame = tk.Frame(self)
     button_frame.pack()
@@ -142,4 +140,3 @@ def initialize_word_entry_buttons(self):
     self.word_add_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
     self.word_add_button.config(state=tk.DISABLED)
     self.word_add_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
-

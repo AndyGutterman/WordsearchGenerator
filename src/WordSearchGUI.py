@@ -161,7 +161,7 @@ class WordSearchGUI(tk.Tk):
             self.update_word_buttons_state(False)
 
         # Reset slider
-        self.character_fill_indicator.config(state=tk.NORMAL, from_=0, to=0)
+        self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=0)
         self.character_fill_indicator.set(0)
         self.character_fill_indicator.config(state=tk.DISABLED)
 
