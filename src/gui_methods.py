@@ -121,10 +121,6 @@ def update_output_text(self, new_content):
     self.output_text.config(state=tk.DISABLED)
 
 
-def update_character_fill_indicator(self, remaining):
-    self.character_fill_indicator.config(state=tk.NORMAL)
-    self.character_fill_indicator.set(remaining)
-    self.character_fill_indicator.config(state=tk.DISABLED)
 
 
 def initialize_word_entry_buttons(self):

@@ -203,7 +203,6 @@ class WordSearchGUI(tk.Tk):
 
     def add_word(self, event=None):
         word = self.word_add_entry.get().strip().upper()
-
         if word == 'DONE':
             self.create()
         elif word == 'AUTO':
