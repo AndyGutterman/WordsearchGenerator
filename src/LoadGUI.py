@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 
-def initialize_gui(self):
+def initialize_base_UI_elements(self):
     def initialize_menubar():
         menubar = tk.Menu(self)
         filemenu = tk.Menu(menubar, tearoff=0)
@@ -13,6 +13,7 @@ def initialize_gui(self):
         menubar.add_cascade(label="File", menu=filemenu)
         menubar.add_cascade(label="Settings", menu=editmenu)
         self.config(menu=menubar)
+
         self.filemenu = filemenu
 
     def initialize_size_elements():
@@ -95,30 +96,6 @@ def configure_output_text(output_text_widget, size):
     new_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
     output_text_widget.insert(tk.END, new_message + "\n", "center")
     output_text_widget.config(state=tk.DISABLED)
-
-
-def update_output_text(self, new_content):
-    current_content = self.output_text.get(1.0, tk.END)
-    word_entry_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
-    if word_entry_message in current_content:
-        self.output_text.config(state=tk.NORMAL)
-        self.output_text.delete(1.0, tk.END)
-        self.output_text.config(state=tk.DISABLED)
-
-    self.output_text.config(state=tk.NORMAL)
-
-    if "word bank" in new_content:
-        start_index = 1.0
-        while True:
-            start_index = self.output_text.search("word bank", start_index, tk.END)
-            if not start_index:
-                break
-            end_index = f"{start_index}+{len('word bank')}c"
-            self.output_text.tag_add("strike", start_index, end_index)
-            start_index = end_index
-
-    self.output_text.insert(tk.END, new_content + "\n", "center")
-    self.output_text.config(state=tk.DISABLED)
 
 
 def initialize_word_entry_buttons(self):
