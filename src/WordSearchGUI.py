@@ -34,7 +34,6 @@ class WordSearchGUI(tk.Tk):
         self.char_slider = None
         initialize_gui(self)
 
-
     def set_size(self, event=None):
         try:
             size = int(self.set_size_entry.get().strip())
@@ -182,7 +181,6 @@ class WordSearchGUI(tk.Tk):
         else:
             self.initialize_buttons(button_frame)
             self.GUI_already_initialized = True
-
 
     def on_word_entry_focus(self, event):
         if self.add_word_entry.get() == 'click to enter word':

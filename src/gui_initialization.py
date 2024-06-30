@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 
+
 def initialize_gui(self):
     def initialize_menubar():
         menubar = tk.Menu(self)
@@ -13,8 +14,6 @@ def initialize_gui(self):
         menubar.add_cascade(label="Settings", menu=editmenu)
         self.config(menu=menubar)
         self.filemenu = filemenu
-
-
 
     def initialize_size_elements():
         self.size_label_frame = tk.Frame(self, pady=10)
@@ -45,24 +44,24 @@ def initialize_gui(self):
                                           command=lambda: self.set_preset_size(16), state=tk.NORMAL)
             self.large_button.pack(side=tk.LEFT, padx=0.25)
             self.large_button.bind("<Return>", lambda event: self.set_preset_size(16))
-
         custom_size_elements()
         preset_size_buttons()
 
+    def initialize_output_and_slider_frame():
+        text_and_slider_frame = tk.Frame(self)
+        text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
+
+        self.output_text = tk.Text(text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
+        self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        self.output_text.tag_configure("center", justify='center')
+
+        initial_message = "\n\n\n\nEnter a size to continue"
+        self.output_text.insert(tk.END, initial_message + "\n", "center")
+
+        self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
+        self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.char_slider.configure(state=tk.DISABLED)
+
     initialize_menubar()
     initialize_size_elements()
-
-    text_and_slider_frame = tk.Frame(self)
-    text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
-
-    self.output_text = tk.Text(text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
-    self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
-    self.output_text.tag_configure("center", justify='center')
-
-    initial_message = "\n\n\n\nEnter a size to continue"
-    self.output_text.insert(tk.END, initial_message + "\n", "center")
-
-    self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
-    self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-    self.char_slider.configure(state=tk.DISABLED)
-
+    initialize_output_and_slider_frame()
