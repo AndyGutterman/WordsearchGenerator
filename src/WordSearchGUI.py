@@ -2,8 +2,11 @@ import math
 import os
 import tkinter as tk
 from tkinter import messagebox, filedialog
+
+from gui_initialization import initialize_gui
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
+
 
 class WordSearchGUI(tk.Tk):
     def __init__(self):
@@ -29,62 +32,8 @@ class WordSearchGUI(tk.Tk):
         self.grid_frame = None
         self.grid_window = None
         self.char_slider = None
-        self.initialize_gui()
+        initialize_gui(self)
 
-    def initialize_gui(self):
-        self.size_label_frame = tk.Frame(self, pady=10)
-        self.size_label_frame.pack()
-
-        menubar = tk.Menu(self)
-        filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Save as...", command=self.save_file, state=tk.DISABLED)
-        filemenu.add_command(label="Load file", command=self.load_file, state=tk.NORMAL)
-        editmenu = tk.Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Reset", command=self.reset, state=tk.NORMAL)
-        menubar.add_cascade(label="File", menu=filemenu)
-        menubar.add_cascade(label="Settings", menu=editmenu)
-        self.config(menu=menubar)
-
-        self.size_prompt_label = tk.Label(self.size_label_frame, text="Select grid size:")
-        self.size_prompt_label.pack(side=tk.LEFT, padx=(0, 2))
-
-        self.set_size_entry = tk.Entry(self.size_label_frame, width=10, justify='center')
-        self.set_size_entry.pack(side=tk.LEFT, padx=(0, 5))
-        self.set_size_entry.bind("<Return>", self.set_size)
-
-        self.set_size_button = tk.Button(self.size_label_frame, text="Set", command=self.set_size)
-        self.set_size_button.pack(side=tk.LEFT, padx=(0, 50))
-
-        self.small_button = tk.Button(self.size_label_frame, text="Small", command=lambda: self.set_preset_size(6),
-                                      state=tk.NORMAL)
-        self.small_button.pack(side=tk.LEFT, padx=0.25)
-        self.small_button.bind("<Return>", lambda event: self.set_preset_size(6))
-
-        self.medium_button = tk.Button(self.size_label_frame, text="Medium", command=lambda: self.set_preset_size(12),
-                                       state=tk.NORMAL)
-        self.medium_button.pack(side=tk.LEFT, padx=0.25)
-        self.medium_button.bind("<Return>", lambda event: self.set_preset_size(12))
-
-        self.large_button = tk.Button(self.size_label_frame, text="Large", command=lambda: self.set_preset_size(16),
-                                      state=tk.NORMAL)
-        self.large_button.pack(side=tk.LEFT, padx=0.25)
-        self.large_button.bind("<Return>", lambda event: self.set_preset_size(16))
-
-        text_and_slider_frame = tk.Frame(self)
-        text_and_slider_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
-
-        self.output_text = tk.Text(text_and_slider_frame, height=10, width=40, wrap=tk.WORD)
-        self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
-        self.output_text.tag_configure("center", justify='center')
-
-        initial_message = "\n\n\n\nEnter a size to continue"
-        self.output_text.insert(tk.END, initial_message + "\n", "center")
-
-        self.char_slider = tk.Scale(text_and_slider_frame, from_=0, to=0, orient=tk.VERTICAL)
-        self.char_slider.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        self.char_slider.configure(state=tk.DISABLED)
-
-        self.filemenu = filemenu
 
     def set_size(self, event=None):
         try:
@@ -156,7 +105,6 @@ class WordSearchGUI(tk.Tk):
             self.lock_size_buttons()
             self.lock_word_buttons()
 
-
     def save_file(self):
         if not self.word_search:
             messagebox.showerror("Error", "No word search generated yet.")
@@ -208,29 +156,34 @@ class WordSearchGUI(tk.Tk):
         self.output_text.insert(tk.END, new_content + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
 
+    def initialize_buttons(self, button_frame):
+        self.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=self.auto_generate_words)
+        self.auto_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
+        self.auto_button.bind("<Return>", lambda event: self.auto_generate_words())
+
+        self.done_button = tk.Button(button_frame, text="Done", fg='green', command=self.create)
+        self.done_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
+
+        self.add_word_entry = tk.Entry(button_frame, justify='center')
+        self.add_word_entry.insert(0, 'click to enter word')
+        self.add_word_entry.bind("<FocusIn>", self.on_word_entry_focus)
+        self.add_word_entry.pack(side=tk.LEFT, padx=(10, 5), pady=10)
+        self.add_word_entry.bind("<Return>", self.add_word)
+
+        self.add_word_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
+        self.add_word_button.config(state=tk.DISABLED)
+        self.add_word_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
+
     def take_words_gui(self):
         button_frame = tk.Frame(self)
         button_frame.pack()
         if self.GUI_already_initialized:
             self.unlock_word_buttons()
         else:
-            self.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=self.auto_generate_words)
-            self.auto_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
-            self.auto_button.bind("<Return>", lambda event: self.auto_generate_words())
-
-            self.done_button = tk.Button(button_frame, text="Done", fg='green', command=self.create)
-            self.done_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
-
-            self.add_word_entry = tk.Entry(button_frame, justify='center')
-            self.add_word_entry.insert(0, 'click to enter word')
-            self.add_word_entry.bind("<FocusIn>", self.on_word_entry_focus)
-            self.add_word_entry.pack(side=tk.LEFT, padx=(10, 5), pady=10)
-            self.add_word_entry.bind("<Return>", self.add_word)
-
-            self.add_word_button = tk.Button(button_frame, text="Add Word", command=self.add_word)
-            self.add_word_button.config(state=tk.DISABLED)
-            self.add_word_button.pack(side=tk.LEFT, padx=(5, 10), pady=10)
+            self.initialize_buttons(button_frame)
             self.GUI_already_initialized = True
+
+
     def on_word_entry_focus(self, event):
         if self.add_word_entry.get() == 'click to enter word':
             self.add_word_entry.delete(0, 'end')
@@ -290,7 +243,6 @@ class WordSearchGUI(tk.Tk):
         self.small_button.config(state=tk.NORMAL)
         self.medium_button.config(state=tk.NORMAL)
         self.large_button.config(state=tk.NORMAL)
-
 
     def lock_word_buttons(self):
         self.auto_button.config(state=tk.DISABLED)
