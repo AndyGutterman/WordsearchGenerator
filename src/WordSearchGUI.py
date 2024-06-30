@@ -59,7 +59,7 @@ class WordSearchGUI(tk.Tk):
             # Update characters remaining slider properties
             self.char_slider.config(from_=size * size, to=0, length=text_height * 7)
             self.update_slider(0)
-            self.unlock_word_buttons()
+            self.update_word_buttons_state(True)
 
 
         except ValueError:
@@ -103,7 +103,7 @@ class WordSearchGUI(tk.Tk):
             self.show_wordbank()
             messagebox.showinfo("File Loaded", f"Word search loaded from {file_path}")
             self.update_size_buttons_state(False)
-            self.lock_word_buttons()
+            self.update_word_buttons_state(False)
 
     def save_file(self):
         if not self.word_search:
@@ -134,7 +134,7 @@ class WordSearchGUI(tk.Tk):
 
     def update_word_entry_buttons(self):
         if self.GUI_already_initialized:
-            self.unlock_word_buttons()
+            self.update_word_buttons_state(True)
         else:
             initialize_buttons(self)
             self.GUI_already_initialized = True
@@ -165,7 +165,7 @@ class WordSearchGUI(tk.Tk):
 
         if self.add_word_entry:
             self.add_word_entry.delete(0, tk.END)
-            self.lock_word_buttons()
+            self.update_word_buttons_state(False)
 
         # Reset slider
         self.char_slider.config(state=tk.NORMAL, from_=0, to=0)
@@ -194,17 +194,12 @@ class WordSearchGUI(tk.Tk):
         self.medium_button.config(state=state)
         self.large_button.config(state=state)
 
-    def lock_word_buttons(self):
-        self.auto_button.config(state=tk.DISABLED)
-        self.done_button.config(state=tk.DISABLED)
-        self.add_word_button.config(state=tk.DISABLED)
-        self.add_word_entry.config(state=tk.DISABLED)
-
-    def unlock_word_buttons(self):
-        self.add_word_entry.config(state=tk.NORMAL)
-        self.add_word_button.config(state=tk.NORMAL)
-        self.auto_button.config(state=tk.NORMAL)
-        self.done_button.config(state=tk.NORMAL)
+    def update_word_buttons_state(self, enabled):
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.auto_button.config(state=state)
+        self.done_button.config(state=state)
+        self.add_word_button.config(state=state)
+        self.add_word_entry.config(state=state)
 
     def create(self):
         self.auto_button.config(state=tk.DISABLED)
