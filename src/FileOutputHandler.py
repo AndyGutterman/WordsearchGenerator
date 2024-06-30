@@ -68,18 +68,4 @@ class FileOutputHandler:
             messagebox.showinfo("File Saved", f"Word search saved as {file_path}")
 
 
-# Example usage in the WordSearchGUI class
-class WordSearchGUI(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.file_handler = FileOutputHandler(self)
-        # ... rest of your initialization code ...
 
-    # Use these methods to handle file operations
-    def load_file(self):
-        self.file_handler.load_file()
-
-    def save_file(self):
-        self.file_handler.save_file()
-
-    # ... rest of your WordSearchGUI code ...

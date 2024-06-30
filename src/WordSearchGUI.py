@@ -4,8 +4,8 @@ import tkinter as tk
 from tkinter import messagebox, filedialog
 
 from FileOutputHandler import FileOutputHandler
-from LoadGUI import initialize_base_UI_elements, initialize_word_entry_buttons, get_size_from_entry, \
-    configure_output_text
+from LoadGUI import initialize_base_UI_elements, get_size_from_entry, adjust_output_text_for_size, \
+    initialize_word_entry_buttons
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
 
@@ -44,16 +44,14 @@ class WordSearchGUI(tk.Tk):
                 size = get_size_from_entry(self.size_set_entry)
                 if size is None:
                     return
-                self.update_ui_before_size_change()
+                self.adjust_ui_before_size_defined()
             else:
                 size = preset_size
 
-            configure_output_text(self.output_text, size)
-
             self.initialize_word_search(size)
-            self.update_ui_after_size_change(size)
+            self.adjust_ui_after_size_defined(size)
 
-            # Disable entry after setting size
+            adjust_output_text_for_size(self.output_text, size)
             self.update_size_buttons_state(False)
 
         except ValueError:
@@ -66,7 +64,7 @@ class WordSearchGUI(tk.Tk):
         self.set_size(preset_size=preset_size)
         self.size_set_entry.config(state=tk.DISABLED)
 
-    def update_ui_before_size_change(self):
+    def adjust_ui_before_size_defined(self):
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
 
@@ -74,7 +72,30 @@ class WordSearchGUI(tk.Tk):
         self.word_search = WordSearch(size)
         self.update_word_entry_buttons()
 
-    def update_ui_after_size_change(self, size):
+    def update_word_entry_buttons(self):
+        if self.GUI_already_initialized:
+            self.update_word_buttons_state(True)
+        else:
+            initialize_word_entry_buttons(self)
+            self.GUI_already_initialized = True
+
+    def update_size_buttons_state(self, enabled):
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.size_set_entry.config(state=state)
+        self.size_set_button.config(state=state)
+        self.small_button.config(state=state)
+        self.medium_button.config(state=state)
+        self.large_button.config(state=state)
+
+    def update_word_buttons_state(self, enabled):
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.auto_button.config(state=state)
+        self.done_button.config(state=state)
+        self.word_add_button.config(state=state)
+        self.word_add_entry.config(state=state)
+
+
+    def adjust_ui_after_size_defined(self, size):
         self.character_fill_indicator.config(from_=size * size, to=0, length=self.output_text.cget("height") * 7)
         self.update_character_fill_indicator(0)
         self.update_word_buttons_state(True)
@@ -129,28 +150,6 @@ class WordSearchGUI(tk.Tk):
         if self.grid_window:
             self.grid_window.destroy()
             self.grid_window = None
-
-    def update_size_buttons_state(self, enabled):
-        state = tk.NORMAL if enabled else tk.DISABLED
-        self.size_set_entry.config(state=state)
-        self.size_set_button.config(state=state)
-        self.small_button.config(state=state)
-        self.medium_button.config(state=state)
-        self.large_button.config(state=state)
-
-    def update_word_buttons_state(self, enabled):
-        state = tk.NORMAL if enabled else tk.DISABLED
-        self.auto_button.config(state=state)
-        self.done_button.config(state=state)
-        self.word_add_button.config(state=state)
-        self.word_add_entry.config(state=state)
-
-    def update_word_entry_buttons(self):
-        if self.GUI_already_initialized:
-            self.update_word_buttons_state(True)
-        else:
-            initialize_word_entry_buttons(self)
-            self.GUI_already_initialized = True
 
     def add_word(self, event=None):
         word = self.word_add_entry.get().strip().upper()
@@ -339,8 +338,6 @@ class WordSearchGUI(tk.Tk):
                     found_words.append(word)
         print("Found words:", found_words)
         self.strike_through_output_text(found_words)
-
-
 
 
 def main():

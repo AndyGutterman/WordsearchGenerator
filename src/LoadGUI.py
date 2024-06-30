@@ -89,12 +89,12 @@ def get_size_from_entry(entry_widget):
         return None
 
 
-def configure_output_text(output_text_widget, size):
+def adjust_output_text_for_size(output_text_widget, size):
     text_height = min(max(size * 3, 10), 30)
     text_width = min(max(size * 5, 40), 80)
     output_text_widget.config(height=text_height, width=text_width)
-    new_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
-    output_text_widget.insert(tk.END, new_message + "\n", "center")
+    initial_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
+    output_text_widget.insert(tk.END, initial_message + "\n", "center")
     output_text_widget.config(state=tk.DISABLED)
 
 
