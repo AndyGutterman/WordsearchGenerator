@@ -130,10 +130,10 @@ class WordSearchGUI(tk.Tk):
             self.word_add_entry.delete(0, tk.END)
             self.update_word_buttons_state(False)
 
-        # Reset slider
-        self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=0)
-        self.character_fill_indicator.set(0)
-        self.character_fill_indicator.config(state=tk.DISABLED)
+        if self.character_fill_indicator:
+            self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=0)
+            self.character_fill_indicator.set(0)
+            self.character_fill_indicator.config(state=tk.DISABLED)
 
         # Clear highlighted labels and positions
         for label in self.highlighted_labels:
@@ -148,6 +148,11 @@ class WordSearchGUI(tk.Tk):
         if self.grid_window:
             self.grid_window.destroy()
             self.grid_window = None
+
+        # Update character_fill_indicator after reset
+        if self.character_fill_indicator:
+            self.character_fill_indicator.config(from_=1, to=0)
+            self.character_fill_indicator.set(0)
 
     def add_word(self, event=None):
         word = self.word_add_entry.get().strip().upper()
@@ -243,6 +248,10 @@ class WordSearchGUI(tk.Tk):
 
     def show_wordbank(self):
         word_bank = self.word_search.words
+
+        # Hide the character_fill_indicator if it exists
+        if self.character_fill_indicator:
+            self.character_fill_indicator.pack_forget()
         if not word_bank:
             empty_wordbank_message = "Word Bank is empty."
             self.update_output_text(empty_wordbank_message)
@@ -263,12 +272,19 @@ class WordSearchGUI(tk.Tk):
                 if i % max_columns == 0:
                     word_bank_text += "\n"
 
-            self.output_text.insert(tk.END, word_bank_text + "\n", "center")
+            self.update_output_text(word_bank_text)  # Use update_output_text method for displaying word bank
+
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
 
+        # Update character_fill_indicator after displaying word bank
+        remaining_characters = self.word_search.size ** 2 - sum(len(w) for w in self.word_search.words)
+        self.update_character_fill_indicator(remaining_characters)
+
         if self.character_fill_indicator:
-            self.character_fill_indicator.pack_forget()
+            self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=self.word_search.size ** 2)
+            self.character_fill_indicator.set(remaining_characters)
+            self.character_fill_indicator.config(state=tk.DISABLED)
 
     def track_found_words(self):
         found_words = []
