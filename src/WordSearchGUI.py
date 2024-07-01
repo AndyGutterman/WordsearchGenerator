@@ -34,8 +34,8 @@ class WordSearchGUI(tk.Tk):
         self.grid_frame = None
         self.grid_window = None
         self.character_fill_indicator = None
-        initialize_base_UI_elements(self)
         self.file_handler = FileOutputHandler(self)
+        initialize_base_UI_elements(self)
 
     def set_size(self, event=None, preset_size=None):
         try:
@@ -70,7 +70,6 @@ class WordSearchGUI(tk.Tk):
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
             return None
-
 
     def set_preset_size(self, preset_size):
         self.size_set_entry.config(state=tk.NORMAL)
