@@ -1,7 +1,6 @@
 import math
-import os
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox
 
 from FileOutputHandler import FileOutputHandler
 from LoadGUI import initialize_base_UI_elements, get_size_from_entry, adjust_output_text_for_size, \
@@ -93,7 +92,6 @@ class WordSearchGUI(tk.Tk):
         self.done_button.config(state=state)
         self.word_add_button.config(state=state)
         self.word_add_entry.config(state=state)
-
 
     def adjust_ui_after_size_defined(self, size):
         self.character_fill_indicator.config(from_=size * size, to=0, length=self.output_text.cget("height") * 7)

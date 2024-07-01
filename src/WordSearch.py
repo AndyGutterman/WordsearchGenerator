@@ -2,6 +2,7 @@ import os
 import random
 from placement.WordPlacer import WordPlacer
 
+
 class WordSearch:
     def __init__(self, size=None):
         self.size = size
@@ -70,8 +71,6 @@ class WordSearch:
             print(f"Error: File '{wordlist_path}' not found.")
             return None
 
-
-
     def fill_grid(self):
         for row in self.grid:
             for i in range(len(row)):
@@ -122,10 +121,10 @@ class WordSearch:
     def find_word(self, word):
         word_length = len(word)
         directions = [
-            (0, 1),    # horizontal
-            (1, 0),    # vertical
-            (1, 1),    # diagonal \
-            (-1, 1)    # diagonal /
+            (0, 1),  # horizontal
+            (1, 0),  # vertical
+            (1, 1),  # diagonal \
+            (-1, 1)  # diagonal /
         ]
         found_positions = []
         for row in range(self.size):
@@ -170,3 +169,6 @@ def main():
     if show_output == 'Y':
         word_search.print_word_locations()
 
+
+if __name__ =="__main__":
+    main()

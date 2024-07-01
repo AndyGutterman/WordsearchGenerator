@@ -102,7 +102,6 @@ def adjust_output_text_for_size(output_text_widget, size):
     output_text_widget.config(state=tk.DISABLED)
 
 
-
 def initialize_word_entry_buttons(self):
     button_frame = tk.Frame(self)
     button_frame.pack()
