@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 
+
 def initialize_base_UI_elements(word_search_gui):
     def initialize_menubar():
         menubar = tk.Menu(word_search_gui)
@@ -26,7 +27,8 @@ def initialize_base_UI_elements(word_search_gui):
             word_search_gui.size_set_entry.pack(side=tk.LEFT, padx=(0, 5))
             word_search_gui.size_set_entry.bind("<Return>", word_search_gui.set_size)
 
-            word_search_gui.size_set_button = tk.Button(word_search_gui.size_label_frame, text="Set", command=word_search_gui.set_size)
+            word_search_gui.size_set_button = tk.Button(word_search_gui.size_label_frame, text="Set",
+                                                        command=word_search_gui.set_size)
             word_search_gui.size_set_button.pack(side=tk.LEFT, padx=(0, 50))
 
         def preset_size_buttons():
@@ -38,19 +40,22 @@ def initialize_base_UI_elements(word_search_gui):
                 word_search_gui.size_label_frame, text="Small",
                 command=lambda size=small_size: word_search_gui.set_preset_size(small_size), state=tk.NORMAL)
             word_search_gui.small_button.pack(side=tk.LEFT, padx=0.25)
-            word_search_gui.small_button.bind("<Return>", lambda event, size=small_size: word_search_gui.set_preset_size(6))
+            word_search_gui.small_button.bind("<Return>",
+                                              lambda event, size=small_size: word_search_gui.set_preset_size(6))
 
             word_search_gui.medium_button = tk.Button(
                 word_search_gui.size_label_frame, text="Medium",
                 command=lambda size=medium_size: word_search_gui.set_preset_size(medium_size), state=tk.NORMAL)
             word_search_gui.medium_button.pack(side=tk.LEFT, padx=0.25)
-            word_search_gui.medium_button.bind("<Return>", lambda event, size=medium_size: word_search_gui.set_preset_size(2))
+            word_search_gui.medium_button.bind("<Return>",
+                                               lambda event, size=medium_size: word_search_gui.set_preset_size(2))
 
             word_search_gui.large_button = tk.Button(
                 word_search_gui.size_label_frame, text="Large",
                 command=lambda size=large_size: word_search_gui.set_preset_size(large_size), state=tk.NORMAL)
             word_search_gui.large_button.pack(side=tk.LEFT, padx=0.25)
-            word_search_gui.large_button.bind("<Return>", lambda event, size=large_size: word_search_gui.set_preset_size(16))
+            word_search_gui.large_button.bind("<Return>",
+                                              lambda event, size=large_size: word_search_gui.set_preset_size(16))
 
         custom_size_elements()
         preset_size_buttons()
@@ -63,6 +68,7 @@ def initialize_base_UI_elements(word_search_gui):
     initialize_output_text(word_search_gui, output_text_and_fill_indicator_frame)
     initialize_scale(word_search_gui, output_text_and_fill_indicator_frame)
 
+
 def initialize_output_text(word_search_gui, output_text_and_fill_indicator_frame):
     initial_message = "\n\n\n\nEnter a size to continue"
     word_search_gui.output_text = tk.Text(output_text_and_fill_indicator_frame, height=10, width=40, wrap=tk.WORD)
@@ -70,23 +76,13 @@ def initialize_output_text(word_search_gui, output_text_and_fill_indicator_frame
     word_search_gui.output_text.tag_configure("center", justify='center')
     word_search_gui.output_text.insert(tk.END, initial_message + "\n", "center")
 
+
 def initialize_scale(word_search_gui, output_text_and_fill_indicator_frame):
     word_search_gui.character_fill_indicator = tk.Scale(
         output_text_and_fill_indicator_frame, from_=1, to=0, orient=tk.VERTICAL)
-    # word_search_gui.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+    word_search_gui.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
     word_search_gui.character_fill_indicator.configure(state=tk.DISABLED)
 
-def get_size_from_entry(entry_widget):
-    size_str = entry_widget.get().strip()
-    try:
-        size = int(size_str)
-        if size <= 0:
-            messagebox.showerror("Error", "Size must be a positive integer.")
-            return None
-        return size
-    except ValueError:
-        messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
-        return None
 
 def adjust_output_text_for_size(output_text_widget, size):
     output_text_widget.config(state=tk.NORMAL)
@@ -100,11 +96,13 @@ def adjust_output_text_for_size(output_text_widget, size):
     output_text_widget.insert(tk.END, initial_message + "\n", "center")
     output_text_widget.config(state=tk.DISABLED)
 
+
 def initialize_word_entry_buttons(word_search_gui):
     button_frame = tk.Frame(word_search_gui)
     button_frame.pack()
 
-    word_search_gui.auto_button = tk.Button(button_frame, text="Auto", fg='green', command=word_search_gui.auto_generate_words)
+    word_search_gui.auto_button = tk.Button(button_frame, text="Auto", fg='green',
+                                            command=word_search_gui.auto_generate_words)
     word_search_gui.auto_button.pack(side=tk.LEFT, padx=(10, 10), pady=10)
     word_search_gui.auto_button.bind("<Return>", lambda event: word_search_gui.auto_generate_words())
 

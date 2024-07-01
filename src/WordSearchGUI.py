@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from FileOutputHandler import FileOutputHandler
-from LoadGUI import initialize_base_UI_elements, get_size_from_entry, adjust_output_text_for_size, \
+from LoadGUI import initialize_base_UI_elements, adjust_output_text_for_size, \
     initialize_word_entry_buttons
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
@@ -40,11 +40,9 @@ class WordSearchGUI(tk.Tk):
     def set_size(self, event=None, preset_size=None):
         try:
             if preset_size is None:
-                size = get_size_from_entry(self.size_set_entry)
+                size = self.get_size_from_entry()
                 if size is None:
                     return
-                self.output_text.config(state=tk.NORMAL)
-                self.output_text.delete(1.0, tk.END)
             else:
                 size = preset_size
 
@@ -60,13 +58,25 @@ class WordSearchGUI(tk.Tk):
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
 
+    def get_size_from_entry(self):
+        size_str = self.size_set_entry.get().strip()
+        try:
+            size = int(size_str)
+            if size <= 0:
+                messagebox.showerror("Error", "Size must be a positive integer.")
+                return None
+            return size
+        except ValueError:
+            messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
+            return None
+
+
     def set_preset_size(self, preset_size):
         self.size_set_entry.config(state=tk.NORMAL)
         self.size_set_entry.delete(0, tk.END)
         self.size_set_entry.insert(0, str(preset_size))
         self.set_size(preset_size=preset_size)
         self.size_set_entry.config(state=tk.DISABLED)
-
 
     def initialize_word_search(self, size):
         self.word_search = WordSearch(size)
@@ -93,8 +103,6 @@ class WordSearchGUI(tk.Tk):
         self.done_button.config(state=state)
         self.word_add_button.config(state=state)
         self.word_add_entry.config(state=state)
-
-
 
     def load_file(self):
         self.file_handler.load_file()
@@ -131,7 +139,6 @@ class WordSearchGUI(tk.Tk):
         if self.character_fill_indicator:
             self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=0)
             self.character_fill_indicator.set(0)
-            self.character_fill_indicator.config(state=tk.DISABLED)
 
         # Clear highlighted labels and positions
         for label in self.highlighted_labels:
@@ -146,8 +153,6 @@ class WordSearchGUI(tk.Tk):
         if self.grid_window:
             self.grid_window.destroy()
             self.grid_window = None
-
-
 
     def add_word(self, event=None):
         word = self.word_add_entry.get().strip().upper()
@@ -270,7 +275,6 @@ class WordSearchGUI(tk.Tk):
             self.update_output_text(word_bank_text)
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
-
 
     def track_found_words(self):
         found_words = []
