@@ -170,5 +170,5 @@ def main():
         word_search.print_word_locations()
 
 
-if __name__ =="__main__":
+if __name__ == "__main__":
     main()
