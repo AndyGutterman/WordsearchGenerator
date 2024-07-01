@@ -90,12 +90,17 @@ def get_size_from_entry(entry_widget):
 
 
 def adjust_output_text_for_size(output_text_widget, size):
+    output_text_widget.config(state=tk.NORMAL)
+    output_text_widget.delete(1.0, tk.END)
+
     text_height = min(max(size * 3, 10), 30)
     text_width = min(max(size * 5, 40), 80)
     output_text_widget.config(height=text_height, width=text_width)
+
     initial_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
     output_text_widget.insert(tk.END, initial_message + "\n", "center")
     output_text_widget.config(state=tk.DISABLED)
+
 
 
 def initialize_word_entry_buttons(self):
