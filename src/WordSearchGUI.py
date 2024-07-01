@@ -43,12 +43,16 @@ class WordSearchGUI(tk.Tk):
                 size = get_size_from_entry(self.size_set_entry)
                 if size is None:
                     return
-                self.adjust_ui_before_size_defined()
+                self.output_text.config(state=tk.NORMAL)
+                self.output_text.delete(1.0, tk.END)
             else:
                 size = preset_size
 
             self.initialize_word_search(size)
-            self.adjust_ui_after_size_defined(size)
+
+            self.character_fill_indicator.config(from_=size * size, to=0, length=self.output_text.cget("height") * 7)
+            self.update_character_fill_indicator(0)
+            self.update_word_buttons_state(True)
 
             adjust_output_text_for_size(self.output_text, size)
             self.update_size_buttons_state(False)
@@ -63,9 +67,6 @@ class WordSearchGUI(tk.Tk):
         self.set_size(preset_size=preset_size)
         self.size_set_entry.config(state=tk.DISABLED)
 
-    def adjust_ui_before_size_defined(self):
-        self.output_text.config(state=tk.NORMAL)
-        self.output_text.delete(1.0, tk.END)
 
     def initialize_word_search(self, size):
         self.word_search = WordSearch(size)
@@ -93,10 +94,7 @@ class WordSearchGUI(tk.Tk):
         self.word_add_button.config(state=state)
         self.word_add_entry.config(state=state)
 
-    def adjust_ui_after_size_defined(self, size):
-        self.character_fill_indicator.config(from_=size * size, to=0, length=self.output_text.cget("height") * 7)
-        self.update_character_fill_indicator(0)
-        self.update_word_buttons_state(True)
+
 
     def load_file(self):
         self.file_handler.load_file()
