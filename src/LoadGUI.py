@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 
 
 def initialize_base_UI_elements(word_search_gui):
@@ -64,7 +63,6 @@ def initialize_base_UI_elements(word_search_gui):
     initialize_size_elements()
     output_text_and_fill_indicator_frame = tk.Frame(word_search_gui)
     output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
-
     initialize_output_text(word_search_gui, output_text_and_fill_indicator_frame)
     initialize_scale(word_search_gui, output_text_and_fill_indicator_frame)
 
@@ -85,14 +83,13 @@ def initialize_scale(word_search_gui, output_text_and_fill_indicator_frame):
 
 
 def adjust_output_text_for_size(output_text_widget, size):
+    initial_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
     output_text_widget.config(state=tk.NORMAL)
     output_text_widget.delete(1.0, tk.END)
 
     text_height = min(max(size * 3, 10), 30)
     text_width = min(max(size * 5, 40), 80)
     output_text_widget.config(height=text_height, width=text_width)
-
-    initial_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
     output_text_widget.insert(tk.END, initial_message + "\n", "center")
     output_text_widget.config(state=tk.DISABLED)
 
