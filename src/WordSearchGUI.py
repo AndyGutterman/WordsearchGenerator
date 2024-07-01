@@ -53,6 +53,7 @@ class WordSearchGUI(tk.Tk):
             self.update_word_buttons_state(True)
 
             adjust_output_text_for_size(self.output_text, size)
+            self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
             self.update_size_buttons_state(False)
 
         except ValueError:
