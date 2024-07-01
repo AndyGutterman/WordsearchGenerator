@@ -147,10 +147,7 @@ class WordSearchGUI(tk.Tk):
             self.grid_window.destroy()
             self.grid_window = None
 
-        # Update character_fill_indicator after reset
-        if self.character_fill_indicator:
-            self.character_fill_indicator.config(from_=1, to=0)
-            self.character_fill_indicator.set(0)
+
 
     def add_word(self, event=None):
         word = self.word_add_entry.get().strip().upper()
