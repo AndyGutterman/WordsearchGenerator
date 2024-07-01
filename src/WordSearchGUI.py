@@ -272,19 +272,10 @@ class WordSearchGUI(tk.Tk):
                 if i % max_columns == 0:
                     word_bank_text += "\n"
 
-            self.update_output_text(word_bank_text)  # Use update_output_text method for displaying word bank
-
+            self.update_output_text(word_bank_text)
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
 
-        # Update character_fill_indicator after displaying word bank
-        remaining_characters = self.word_search.size ** 2 - sum(len(w) for w in self.word_search.words)
-        self.update_character_fill_indicator(remaining_characters)
-
-        if self.character_fill_indicator:
-            self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=self.word_search.size ** 2)
-            self.character_fill_indicator.set(remaining_characters)
-            self.character_fill_indicator.config(state=tk.DISABLED)
 
     def track_found_words(self):
         found_words = []
