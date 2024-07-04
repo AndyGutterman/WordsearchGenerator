@@ -212,13 +212,16 @@ class WordSearchGUI(tk.Tk):
         if self.word_search.size > 16:
             self.grid_window = tk.Toplevel(self)
             self.grid_window.title("Word Search Grid")
-            self.grid_frame = tk.Frame(self.grid_window, padx=20, pady=20)
+            self.grid_frame = tk.Frame(self.grid_window, padx=0, pady=0)
         else:
-            self.grid_frame = tk.Frame(self, padx=20, pady=20)
+            self.grid_frame = tk.Frame(self, padx=2, pady=2)
 
-        self.grid_frame.pack(padx=25, pady=10)
+        if self.word_search.size == 16:
+            self.grid_frame.pack(padx=0, pady=5)
+        else:
+            self.grid_frame.pack(padx=2, pady=10)
 
-        font_size = max(12, 20 - self.word_search.size // 2)
+        font_size = max(9, 20 - self.word_search.size // 2)
 
         for r, row in enumerate(self.word_search.grid):
             for c, letter in enumerate(row):
