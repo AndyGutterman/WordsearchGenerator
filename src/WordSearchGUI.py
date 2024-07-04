@@ -51,7 +51,7 @@ class WordSearchGUI(tk.Tk):
             self.update_character_fill_indicator(0)
             self.update_word_buttons_state(True)
 
-            self.interface_creator.adjust_output_text_for_size(self.output_text, size)
+            self.adjust_output_text_for_size(self.output_text, size)
             self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
             self.update_size_buttons_state(False)
 
@@ -84,8 +84,10 @@ class WordSearchGUI(tk.Tk):
     def update_word_entry_buttons(self):
         if self.GUI_already_initialized:
             self.update_word_buttons_state(True)
+            self.interface_creator.show_word_entry_elements()
         else:
-            self.interface_creator.initialize_word_entry_buttons(self)
+            self.interface_creator.initialize_word_entry_buttons()
+            print("Showing word entry elements")
             self.GUI_already_initialized = True
 
     def update_size_buttons_state(self, enabled):
@@ -102,6 +104,10 @@ class WordSearchGUI(tk.Tk):
         self.done_button.config(state=state)
         self.word_add_button.config(state=state)
         self.word_add_entry.config(state=state)
+
+    def update_save_filemenu_state(self, enabled):
+        state = tk.NORMAL if enabled else tk.DISABLED
+        self.filemenu.entryconfig("Save as...", state=state)
 
     def load_file(self):
         self.file_handler.load_file()
@@ -120,13 +126,14 @@ class WordSearchGUI(tk.Tk):
             self.word_add_button.config(state=tk.NORMAL)
 
     def reset(self):
+        self.interface_creator.reload_base_elements()
         self.update_size_buttons_state(True)
         self.word_search = None
         self.size_set_entry.delete(0, 'end')
         self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
 
         self.output_text.config(state=tk.NORMAL)
-        self.output_text.delete(1.0, tk.END)
+        self.output_text.delete(1.0, tk.END)  # Clear the text widget
         initial_message = "\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
@@ -134,7 +141,6 @@ class WordSearchGUI(tk.Tk):
         if self.word_add_entry:
             self.word_add_entry.delete(0, tk.END)
             self.update_word_buttons_state(False)
-
         if self.character_fill_indicator:
             self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=0)
             self.character_fill_indicator.set(0)
@@ -186,14 +192,13 @@ class WordSearchGUI(tk.Tk):
         self.create()
 
     def create(self):
-        self.auto_button.config(state=tk.DISABLED)
-        self.done_button.config(state=tk.DISABLED)
-        self.word_add_button.config(state=tk.DISABLED)
-        self.word_add_entry.config(state=tk.DISABLED)
-        self.filemenu.entryconfig("Save as...", state=tk.NORMAL)
+        self.interface_creator.hide_word_entry_elements()
+        self.interface_creator.hide_size_entry_elements()
+        self.update_word_buttons_state(False)
+        self.update_size_buttons_state(False)
+        self.update_save_filemenu_state(True)
         WordPlacer.place_words(self.word_search)
         self.word_search.fill_grid()
-        self.output_text.config(state=tk.NORMAL)
         self.show_word_search()
         self.show_wordbank()
         self.track_found_words()
@@ -211,7 +216,7 @@ class WordSearchGUI(tk.Tk):
         else:
             self.grid_frame = tk.Frame(self, padx=20, pady=20)
 
-        self.grid_frame.pack(padx=20, pady=20)
+        self.grid_frame.pack(padx=25, pady=10)
 
         font_size = max(12, 20 - self.word_search.size // 2)
 
@@ -256,11 +261,13 @@ class WordSearchGUI(tk.Tk):
         output_text_widget.config(height=text_height, width=text_width)
         output_text_widget.insert(tk.END, initial_message + "\n", "center")
         output_text_widget.config(state=tk.DISABLED)
+
     def hide_customizable_elements(self):
         if self.character_fill_indicator:
             self.character_fill_indicator.pack_forget()
 
     def show_wordbank(self):
+        self.output_text.config(state=tk.NORMAL)
         word_bank = self.word_search.words
 
         self.hide_customizable_elements()
@@ -363,5 +370,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
