@@ -126,11 +126,11 @@ class WordSearchGUI(tk.Tk):
             self.word_add_button.config(state=tk.NORMAL)
 
     def reset(self):
+        self.word_search = None
+        self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
         self.interface_creator.reload_base_elements()
         self.update_size_buttons_state(True)
-        self.word_search = None
         self.size_set_entry.delete(0, 'end')
-        self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
 
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)  # Clear the text widget
@@ -194,6 +194,8 @@ class WordSearchGUI(tk.Tk):
     def create(self):
         self.interface_creator.hide_word_entry_elements()
         self.interface_creator.hide_size_entry_elements()
+        self.interface_creator.hide_character_fill_indicator()
+
         self.update_word_buttons_state(False)
         self.update_size_buttons_state(False)
         self.update_save_filemenu_state(True)
@@ -265,15 +267,11 @@ class WordSearchGUI(tk.Tk):
         output_text_widget.insert(tk.END, initial_message + "\n", "center")
         output_text_widget.config(state=tk.DISABLED)
 
-    def hide_customizable_elements(self):
-        if self.character_fill_indicator:
-            self.character_fill_indicator.pack_forget()
+
 
     def show_wordbank(self):
         self.output_text.config(state=tk.NORMAL)
         word_bank = self.word_search.words
-
-        self.hide_customizable_elements()
         if not word_bank:
             empty_wordbank_message = "Word Bank is empty."
             self.update_output_text(empty_wordbank_message)

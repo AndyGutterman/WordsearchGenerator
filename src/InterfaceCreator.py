@@ -8,6 +8,7 @@ class InterfaceCreator:
         self.root = root
         self.word_entry_buttons_frame = None
         self.output_text_and_fill_indicator_frame = None
+        self.character_fill_indicator = None
 
     def initialize_base_UI_elements(self):
         self.initialize_menubar()
@@ -71,10 +72,10 @@ class InterfaceCreator:
         self.root.output_text = output_text
 
     def initialize_scale(self, parent_frame):
-        character_fill_indicator = tk.Scale(parent_frame, from_=1, to=0, orient=tk.VERTICAL)
-        character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        character_fill_indicator.config(state=tk.DISABLED)
-        self.root.character_fill_indicator = character_fill_indicator
+        self.character_fill_indicator = tk.Scale(parent_frame, from_=1, to=0, orient=tk.VERTICAL)
+        self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.character_fill_indicator.config(state=tk.DISABLED)
+        self.root.character_fill_indicator = self.character_fill_indicator
 
     def initialize_word_entry_buttons(self):
         self.word_entry_buttons_frame = tk.Frame(self.root)
@@ -108,13 +109,22 @@ class InterfaceCreator:
         self.show_size_entry_elements()
         self.show_output_text_frame()
 
+    def show_character_fill_indicator(self):
+        self.character_fill_indicator.config(from_=self.root.size * self.root.size, to=0,
+                                             length=self.root.output_text.cget("height") * 7)
+        self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+
+    def hide_character_fill_indicator(self):
+        if self.character_fill_indicator:
+            self.character_fill_indicator.pack_forget()
+
     def hide_output_text_frame(self):
         if self.output_text_and_fill_indicator_frame:
             self.output_text_and_fill_indicator_frame.pack_forget()
 
     def show_output_text_frame(self):
         if self.output_text_and_fill_indicator_frame:
-            self.output_text_and_fill_indicator_frame.pack()
+            self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
 
     def hide_size_entry_elements(self):
         if self.size_buttons_labels_frame:
