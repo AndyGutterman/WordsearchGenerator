@@ -3,8 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 from FileOutputHandler import FileOutputHandler
-from LoadGUI import initialize_base_UI_elements, adjust_output_text_for_size, \
-    initialize_word_entry_buttons
+from InterfaceCreator import InterfaceCreator
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
 
@@ -19,7 +18,6 @@ class WordSearchGUI(tk.Tk):
         self.title("Word Search Generator")
         self.filemenu = None
         self.word_search = None
-        self.size_label_frame = None
         self.size_prompt_label = None
         self.size_set_entry = None
         self.size_set_button = None
@@ -35,7 +33,8 @@ class WordSearchGUI(tk.Tk):
         self.grid_window = None
         self.character_fill_indicator = None
         self.file_handler = FileOutputHandler(self)
-        initialize_base_UI_elements(self)
+        self.interface_creator = InterfaceCreator(self)
+        self.interface_creator.initialize_base_UI_elements()
 
     def set_size(self, event=None, preset_size=None):
         try:
@@ -52,7 +51,7 @@ class WordSearchGUI(tk.Tk):
             self.update_character_fill_indicator(0)
             self.update_word_buttons_state(True)
 
-            adjust_output_text_for_size(self.output_text, size)
+            self.interface_creator.adjust_output_text_for_size(self.output_text, size)
             self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
             self.update_size_buttons_state(False)
 
@@ -86,7 +85,7 @@ class WordSearchGUI(tk.Tk):
         if self.GUI_already_initialized:
             self.update_word_buttons_state(True)
         else:
-            initialize_word_entry_buttons(self)
+            self.interface_creator.initialize_word_entry_buttons(self)
             self.GUI_already_initialized = True
 
     def update_size_buttons_state(self, enabled):
@@ -246,12 +245,25 @@ class WordSearchGUI(tk.Tk):
         self.output_text.insert(tk.END, new_content + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
 
+    @staticmethod
+    def adjust_output_text_for_size(output_text_widget, size):
+        initial_message = "\n\nEnter words below to continue\n\nType 'auto' or 'done' when finished"
+        output_text_widget.config(state=tk.NORMAL)
+        output_text_widget.delete(1.0, tk.END)
+
+        text_height = min(max(size * 3, 10), 30)
+        text_width = min(max(size * 5, 40), 80)
+        output_text_widget.config(height=text_height, width=text_width)
+        output_text_widget.insert(tk.END, initial_message + "\n", "center")
+        output_text_widget.config(state=tk.DISABLED)
+    def hide_customizable_elements(self):
+        if self.character_fill_indicator:
+            self.character_fill_indicator.pack_forget()
+
     def show_wordbank(self):
         word_bank = self.word_search.words
 
-        # Hide the character_fill_indicator if it exists
-        if self.character_fill_indicator:
-            self.character_fill_indicator.pack_forget()
+        self.hide_customizable_elements()
         if not word_bank:
             empty_wordbank_message = "Word Bank is empty."
             self.update_output_text(empty_wordbank_message)
@@ -351,3 +363,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
