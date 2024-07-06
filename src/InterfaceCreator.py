@@ -8,7 +8,9 @@ class InterfaceCreator:
         self.root = root
         self.word_entry_buttons_frame = None
         self.output_text_and_fill_indicator_frame = None
-        self.character_fill_indicator = None
+        self.character_fill_scale = None
+        self.character_fill_indicator_label = None
+        self.character_fill_indicator_text = tk.StringVar()
 
     def initialize_base_UI_elements(self):
         self.initialize_menubar()
@@ -16,7 +18,7 @@ class InterfaceCreator:
         self.output_text_and_fill_indicator_frame = tk.Frame(self.root)
         self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
         self.initialize_output_text(self.output_text_and_fill_indicator_frame)
-        self.initialize_scale(self.output_text_and_fill_indicator_frame)
+        self.initialize_character_fill_indicator(self.output_text_and_fill_indicator_frame)
 
     def initialize_menubar(self):
         menubar = tk.Menu(self.root)
@@ -71,11 +73,15 @@ class InterfaceCreator:
         output_text.insert(tk.END, initial_message + "\n", "center")
         self.root.output_text = output_text
 
-    def initialize_scale(self, parent_frame):
-        self.character_fill_indicator = tk.Scale(parent_frame, from_=1, to=0, orient=tk.VERTICAL)
-        self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-        self.character_fill_indicator.config(state=tk.DISABLED)
-        self.root.character_fill_indicator = self.character_fill_indicator
+    def initialize_character_fill_indicator(self, parent_frame):
+        self.character_fill_indicator_text.set("--")
+        self.character_fill_indicator_label = tk.Label(parent_frame, textvariable=self.character_fill_indicator_text)
+        self.character_fill_indicator_label.pack(side=tk.RIGHT, anchor='ne', padx=(10, 0))
+
+        self.character_fill_scale = tk.Scale(parent_frame, from_=1, to=0, orient=tk.VERTICAL)
+        self.character_fill_scale.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.character_fill_scale.config(state=tk.DISABLED)
+        self.root.character_fill_scale = self.character_fill_scale
 
     def initialize_word_entry_buttons(self):
         self.word_entry_buttons_frame = tk.Frame(self.root)
@@ -110,13 +116,16 @@ class InterfaceCreator:
         self.show_output_text_frame()
 
     def show_character_fill_indicator(self):
-        self.character_fill_indicator.config(from_=self.root.size * self.root.size, to=0,
-                                             length=self.root.output_text.cget("height") * 7)
-        self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+        self.character_fill_scale.pack_forget()
+        self.character_fill_indicator_text.set("--")
+        self.character_fill_indicator_label.pack(side=tk.RIGHT, anchor='ne', padx=(10, 0))
+        self.character_fill_scale.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
 
     def hide_character_fill_indicator(self):
-        if self.character_fill_indicator:
-            self.character_fill_indicator.pack_forget()
+        if self.character_fill_scale:
+            self.character_fill_scale.pack_forget()
+        if self.character_fill_indicator_label:
+            self.character_fill_indicator_label.pack_forget()
 
     def hide_output_text_frame(self):
         if self.output_text_and_fill_indicator_frame:

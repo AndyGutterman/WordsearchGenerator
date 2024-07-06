@@ -31,7 +31,8 @@ class WordSearchGUI(tk.Tk):
         self.done_button = None
         self.grid_frame = None
         self.grid_window = None
-        self.character_fill_indicator = None
+        self.character_fill_indicator_label = None
+        self.character_fill_scale = None
         self.file_handler = FileOutputHandler(self)
         self.interface_creator = InterfaceCreator(self)
         self.interface_creator.initialize_base_UI_elements()
@@ -45,15 +46,14 @@ class WordSearchGUI(tk.Tk):
             else:
                 size = preset_size
 
+            self.update_size_buttons_state(False)
             self.initialize_word_search(size)
-
-            self.character_fill_indicator.config(from_=size * size, to=0, length=self.output_text.cget("height") * 7)
+            self.character_fill_scale.config(from_=size * size, to=0, length=self.output_text.cget("height") * 7)
             self.update_character_fill_indicator(0)
+            self.update_character_fill_label(size)
             self.update_word_buttons_state(True)
 
             self.adjust_output_text_for_size(self.output_text, size)
-            self.character_fill_indicator.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-            self.update_size_buttons_state(False)
 
         except ValueError:
             messagebox.showerror("Error", "Invalid size. Please enter a valid integer.")
@@ -87,7 +87,6 @@ class WordSearchGUI(tk.Tk):
             self.interface_creator.show_word_entry_elements()
         else:
             self.interface_creator.initialize_word_entry_buttons()
-            print("Showing word entry elements")
             self.GUI_already_initialized = True
 
     def update_size_buttons_state(self, enabled):
@@ -116,9 +115,13 @@ class WordSearchGUI(tk.Tk):
         self.file_handler.save_file()
 
     def update_character_fill_indicator(self, remaining):
-        self.character_fill_indicator.config(state=tk.NORMAL)
-        self.character_fill_indicator.set(remaining)
-        self.character_fill_indicator.config(state=tk.DISABLED)
+        self.character_fill_scale.config(state=tk.NORMAL)
+        self.character_fill_scale.set(remaining)
+        self.character_fill_scale.config(state=tk.DISABLED)
+
+    def update_character_fill_label(self, size):
+        max_characters = size * size
+        self.interface_creator.character_fill_indicator_text.set(f"{max_characters}")
 
     def on_word_entry_focus(self, event):
         if self.word_add_entry.get() == 'click to enter word':
@@ -129,11 +132,11 @@ class WordSearchGUI(tk.Tk):
         self.word_search = None
         self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
         self.interface_creator.reload_base_elements()
+        self.interface_creator.show_character_fill_indicator()
         self.update_size_buttons_state(True)
         self.size_set_entry.delete(0, 'end')
-
         self.output_text.config(state=tk.NORMAL)
-        self.output_text.delete(1.0, tk.END)  # Clear the text widget
+        self.output_text.delete(1.0, tk.END)
         initial_message = "\n\nEnter a size to continue"
         self.output_text.insert(tk.END, initial_message + "\n", "center")
         self.output_text.config(state=tk.DISABLED)
@@ -141,17 +144,18 @@ class WordSearchGUI(tk.Tk):
         if self.word_add_entry:
             self.word_add_entry.delete(0, tk.END)
             self.update_word_buttons_state(False)
-        if self.character_fill_indicator:
-            self.character_fill_indicator.config(state=tk.NORMAL, from_=1, to=0)
-            self.character_fill_indicator.set(0)
 
-        # Clear highlighted labels and positions
+        if self.character_fill_scale:
+            self.character_fill_scale.config(state=tk.NORMAL, from_=1, to=0)
+            self.character_fill_scale.set(0)
+
+        self.interface_creator.show_character_fill_indicator()
+
         for label in self.highlighted_labels:
             label.config(bg='SystemButtonFace')
         self.highlighted_labels = []
         self.highlighted_positions = []
 
-        # Destroy grid components if they exist
         if self.grid_frame:
             self.grid_frame.destroy()
             self.grid_frame = None
@@ -218,19 +222,21 @@ class WordSearchGUI(tk.Tk):
         else:
             self.grid_frame = tk.Frame(self, padx=2, pady=2)
 
-        if self.word_search.size == 16:
-            self.grid_frame.pack(padx=0, pady=5)
+        if self.word_search.size == 15:
+            font_size = 20
+        elif self.word_search.size < 15:
+            font_size = 20
         else:
-            self.grid_frame.pack(padx=2, pady=10)
-
-        font_size = max(9, 20 - self.word_search.size // 2)
+            font_size = 14
 
         for r, row in enumerate(self.word_search.grid):
             for c, letter in enumerate(row):
-                label = tk.Label(self.grid_frame, text=letter, borderwidth=0, relief="solid", width=4, height=2,
+                label = tk.Label(self.grid_frame, text=letter, width=2, height=1, padx=1, pady=1,
                                  font=("Helvetica", font_size))
                 label.grid(row=r, column=c)
                 label.bind("<Button-1>", self.on_label_click)
+
+        self.grid_frame.pack()
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)
@@ -266,8 +272,6 @@ class WordSearchGUI(tk.Tk):
         output_text_widget.config(height=text_height, width=text_width)
         output_text_widget.insert(tk.END, initial_message + "\n", "center")
         output_text_widget.config(state=tk.DISABLED)
-
-
 
     def show_wordbank(self):
         self.output_text.config(state=tk.NORMAL)
@@ -348,7 +352,7 @@ class WordSearchGUI(tk.Tk):
             for label in self.highlighted_labels:
                 label_text = label.cget("text")
                 info = label.grid_info()
-                label_position = (info['row'], info['column'])
+                label_position = (info['row'], 'column')
                 print(f"Label text: {label_text}, Position: {label_position}")
 
     def check_highlighted_tiles(self):
