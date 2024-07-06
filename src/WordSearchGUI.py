@@ -7,7 +7,8 @@ from InterfaceCreator import InterfaceCreator
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
 
-
+#todo add: hint button that highlights an unfound letter using a greenhighlight
+#todo fix: words are not 'found' or struck through if intersecting many of the same word
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -236,7 +237,7 @@ class WordSearchGUI(tk.Tk):
                 label.grid(row=r, column=c)
                 label.bind("<Button-1>", self.on_label_click)
 
-        self.grid_frame.pack()
+        self.grid_frame.pack(side=tk.TOP, padx=20, pady=(0, 20), expand=True)
 
     def update_output_text(self, new_content):
         current_content = self.output_text.get(1.0, tk.END)

@@ -16,7 +16,7 @@ class InterfaceCreator:
         self.initialize_menubar()
         self.initialize_size_elements()
         self.output_text_and_fill_indicator_frame = tk.Frame(self.root)
-        self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
+        self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.NONE, expand=True)
         self.initialize_output_text(self.output_text_and_fill_indicator_frame)
         self.initialize_character_fill_indicator(self.output_text_and_fill_indicator_frame)
 
@@ -133,7 +133,7 @@ class InterfaceCreator:
 
     def show_output_text_frame(self):
         if self.output_text_and_fill_indicator_frame:
-            self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.BOTH, expand=True)
+            self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.NONE, expand=True)
 
     def hide_size_entry_elements(self):
         if self.size_buttons_labels_frame:
