@@ -4,13 +4,14 @@ from tkinter import messagebox
 
 class InterfaceCreator:
     def __init__(self, root):
-        self.size_buttons_labels_frame = None
         self.root = root
+        self.size_buttons_labels_frame = None
         self.word_entry_buttons_frame = None
         self.output_text_and_fill_indicator_frame = None
         self.character_fill_scale = None
         self.character_fill_indicator_label = None
         self.character_fill_indicator_text = tk.StringVar()
+        self.status_bar = None
 
     def initialize_base_UI_elements(self):
         self.initialize_menubar()
@@ -19,6 +20,7 @@ class InterfaceCreator:
         self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.NONE, expand=True)
         self.initialize_output_text(self.output_text_and_fill_indicator_frame)
         self.initialize_character_fill_indicator(self.output_text_and_fill_indicator_frame)
+        self.initialize_status_bar()
 
     def initialize_menubar(self):
         menubar = tk.Menu(self.root)
@@ -108,6 +110,16 @@ class InterfaceCreator:
         self.root.word_add_entry = word_add_entry
         self.root.word_add_button = word_add_button
 
+    def initialize_status_bar(self):
+        self.status_bar = tk.Label(self.root, text="Press 'H' for a hint", bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        self.root.status_bar = self.status_bar  # Assign to root
+
+    def show_status_bar(self):
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+    def hide_status_bar(self):
+        self.status_bar.pack_forget()
+
     def reload_base_elements(self):
         # .pack_forget the following, then re-pack in correct order:
         self.hide_output_text_frame()
@@ -116,37 +128,52 @@ class InterfaceCreator:
         self.show_output_text_frame()
 
     def show_character_fill_indicator(self):
-        self.character_fill_scale.pack_forget()
-        self.character_fill_indicator_text.set("--")
-        self.character_fill_indicator_label.pack(side=tk.RIGHT, anchor='ne', padx=(10, 0))
-        self.character_fill_scale.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
-
-    def hide_character_fill_indicator(self):
-        if self.character_fill_scale:
+        if self.character_fill_scale and self.character_fill_indicator_label:
             self.character_fill_scale.pack_forget()
-        if self.character_fill_indicator_label:
             self.character_fill_indicator_label.pack_forget()
 
-    def hide_output_text_frame(self):
-        if self.output_text_and_fill_indicator_frame:
-            self.output_text_and_fill_indicator_frame.pack_forget()
+            self.character_fill_scale.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
+            self.character_fill_indicator_label.pack(side=tk.RIGHT, anchor='ne', padx=(10, 0))
+
+    def hide_character_fill_indicator(self):
+        if self.character_fill_scale and self.character_fill_indicator_label:
+            self.character_fill_scale.pack_forget()
+            self.character_fill_indicator_label.pack_forget()
+            print("Character fill indicator hidden.")
+        else:
+            print("Character fill indicator does not exist or has not been initialized.")
 
     def show_output_text_frame(self):
         if self.output_text_and_fill_indicator_frame:
             self.output_text_and_fill_indicator_frame.pack(pady=(10, 20), padx=20, fill=tk.NONE, expand=True)
 
-    def hide_size_entry_elements(self):
-        if self.size_buttons_labels_frame:
-            self.size_buttons_labels_frame.pack_forget()
+    def hide_output_text_frame(self):
+        if self.output_text_and_fill_indicator_frame:
+            self.output_text_and_fill_indicator_frame.pack_forget()
+            print("Output text frame hidden.")
+
+        else:
+            print("Output text frame does not exist or has not been initialized.")
+
+    def show_word_entry_elements(self):
+        if self.word_entry_buttons_frame:
+            self.word_entry_buttons_frame.pack()
+
+    def hide_word_entry_elements(self):
+        print("Hiding word entry elements...")
+        if self.word_entry_buttons_frame:
+            print("Word entry buttons frame exists, hiding now.")
+            self.word_entry_buttons_frame.pack_forget()
+        else:
+            print("Word entry buttons frame does not exist or has not been initialized.")
 
     def show_size_entry_elements(self):
         if self.size_buttons_labels_frame:
             self.size_buttons_labels_frame.pack()
 
-    def hide_word_entry_elements(self):
-        if self.word_entry_buttons_frame:
-            self.word_entry_buttons_frame.pack_forget()
-
-    def show_word_entry_elements(self):
-        if self.word_entry_buttons_frame:
-            self.word_entry_buttons_frame.pack()
+    def hide_size_entry_elements(self):
+        if self.size_buttons_labels_frame:
+            self.size_buttons_labels_frame.pack_forget()
+            print("Size entry elements hidden.")
+        else:
+            print("Size entry elements do not exist or have not been initialized.")

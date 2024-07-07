@@ -1,4 +1,5 @@
 import math
+import random
 import tkinter as tk
 from tkinter import messagebox
 
@@ -7,8 +8,8 @@ from InterfaceCreator import InterfaceCreator
 from placement.WordPlacer import WordPlacer
 from WordSearch import WordSearch
 
-#todo add: hint button that highlights an unfound letter using a greenhighlight
-#todo fix: words are not 'found' or struck through if intersecting many of the same word
+
+# todo fix: words are not 'found' or struck through if intersecting many of the same word
 class WordSearchGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -26,17 +27,20 @@ class WordSearchGUI(tk.Tk):
         self.medium_button = None
         self.large_button = None
         self.output_text = None
+        self.character_fill_indicator_label = None
+        self.character_fill_scale = None
         self.word_add_entry = None
         self.word_add_button = None
         self.auto_button = None
         self.done_button = None
         self.grid_frame = None
         self.grid_window = None
-        self.character_fill_indicator_label = None
-        self.character_fill_scale = None
+        self.status_bar = None
         self.file_handler = FileOutputHandler(self)
         self.interface_creator = InterfaceCreator(self)
         self.interface_creator.initialize_base_UI_elements()
+        self.found_words = []
+        self.bind('<h>', self.hint)
 
     def set_size(self, event=None, preset_size=None):
         try:
@@ -92,18 +96,27 @@ class WordSearchGUI(tk.Tk):
 
     def update_size_buttons_state(self, enabled):
         state = tk.NORMAL if enabled else tk.DISABLED
-        self.size_set_entry.config(state=state)
-        self.size_set_button.config(state=state)
-        self.small_button.config(state=state)
-        self.medium_button.config(state=state)
-        self.large_button.config(state=state)
+        if self.size_set_entry:
+            self.size_set_entry.config(state=state)
+        if self.size_set_button:
+            self.size_set_button.config(state=state)
+        if self.small_button:
+            self.small_button.config(state=state)
+        if self.medium_button:
+            self.medium_button.config(state=state)
+        if self.large_button:
+            self.large_button.config(state=state)
 
     def update_word_buttons_state(self, enabled):
         state = tk.NORMAL if enabled else tk.DISABLED
-        self.auto_button.config(state=state)
-        self.done_button.config(state=state)
-        self.word_add_button.config(state=state)
-        self.word_add_entry.config(state=state)
+        if self.auto_button:
+            self.auto_button.config(state=state)
+        if self.done_button:
+            self.done_button.config(state=state)
+        if self.word_add_button:
+            self.word_add_button.config(state=state)
+        if self.word_add_entry:
+            self.word_add_entry.config(state=state)
 
     def update_save_filemenu_state(self, enabled):
         state = tk.NORMAL if enabled else tk.DISABLED
@@ -122,6 +135,8 @@ class WordSearchGUI(tk.Tk):
 
     def update_character_fill_label(self, size):
         max_characters = size * size
+        if max_characters == 0:
+            self.interface_creator.character_fill_indicator_text.set("--")
         self.interface_creator.character_fill_indicator_text.set(f"{max_characters}")
 
     def on_word_entry_focus(self, event):
@@ -134,7 +149,9 @@ class WordSearchGUI(tk.Tk):
         self.filemenu.entryconfig("Save as...", state=tk.DISABLED)
         self.interface_creator.reload_base_elements()
         self.interface_creator.show_character_fill_indicator()
+        self.interface_creator.hide_status_bar()
         self.update_size_buttons_state(True)
+        self.update_character_fill_label(0)
         self.size_set_entry.delete(0, 'end')
         self.output_text.config(state=tk.NORMAL)
         self.output_text.delete(1.0, tk.END)
@@ -179,10 +196,10 @@ class WordSearchGUI(tk.Tk):
             self.update_output_text(confirmation_message)
             self.update_character_fill_indicator(self.word_search.size ** 2 - remaining_spaces)
             if remaining_spaces <= (1 / 4 * self.word_search.size * self.word_search.size):
-                grid_near_full_warning = f"** Note: Grid nearly full **"
+                grid_near_full_warning = f"** Note: Grid is 75% full **"
                 self.update_output_text(grid_near_full_warning)
             if remaining_spaces <= (1 / 8 * self.word_search.size * self.word_search.size):
-                grid_critically_full_warning = f"** Warning: grid space very low - may not generate **"
+                grid_critically_full_warning = f"** Warning: Grid space very low **"
                 self.update_output_text(grid_critically_full_warning)
             if remaining_spaces <= 0:
                 self.create()
@@ -197,9 +214,9 @@ class WordSearchGUI(tk.Tk):
         self.create()
 
     def create(self):
-        self.interface_creator.hide_word_entry_elements()
-        self.interface_creator.hide_size_entry_elements()
-        self.interface_creator.hide_character_fill_indicator()
+        self.hide_customization_elements()
+        self.interface_creator.initialize_status_bar()
+        self.interface_creator.show_status_bar()
 
         self.update_word_buttons_state(False)
         self.update_size_buttons_state(False)
@@ -209,6 +226,11 @@ class WordSearchGUI(tk.Tk):
         self.show_word_search()
         self.show_wordbank()
         self.track_found_words()
+
+    def hide_customization_elements(self):
+        self.interface_creator.hide_word_entry_elements()
+        self.interface_creator.hide_size_entry_elements()
+        self.interface_creator.hide_character_fill_indicator()
 
     def show_word_search(self):
         if self.grid_frame:
@@ -296,24 +318,70 @@ class WordSearchGUI(tk.Tk):
                 word_bank_text += f"{word.ljust(max_word_length + 2)}"
                 if i % max_columns == 0:
                     word_bank_text += "\n"
-
             self.update_output_text(word_bank_text)
             self.output_text.config(height=text_height)
             self.output_text.config(state=tk.DISABLED)
 
     def track_found_words(self):
-        found_words = []
+        self.found_words = []
         for word in self.word_search.words:
             positions = self.word_search.find_word(word)
             if positions:
                 highlighted_positions_set = set(self.highlighted_positions)
                 word_positions_set = set(positions)
                 if word_positions_set.issubset(highlighted_positions_set):
-                    found_words.append(word)
-        print("Found words:", found_words)
-        self.strike_through_output_text(found_words)
+                    self.found_words.append(word)
+        print("Found words:", self.found_words)
+        self.strikethrough_output_text(self.found_words)
 
-    def strike_through_output_text(self, found_words):
+    def hint(self, event=None):
+        if not self.word_search:
+            return
+
+        unfound_letters = []
+        for word in self.word_search.words:
+            if word not in self.found_words:
+                positions = self.word_search.find_word(word)
+                for pos in positions:
+                    if pos not in self.highlighted_positions:
+                        unfound_letters.append(pos)
+
+        if unfound_letters:
+            random_position = random.choice(unfound_letters)
+            self.highlight_position(random_position)
+
+    def highlight_position(self, position):
+        row, col = position
+        label = self.grid_frame.grid_slaves(row=row, column=col)[0]
+        self.highlight_label(label)
+
+    def highlight_label(self, label):
+        info = label.grid_info()
+        row, col = info['row'], info['column']
+
+        if (row, col) in self.highlighted_positions:
+            label.config(bg='SystemButtonFace')
+            self.highlighted_positions.remove((row, col))
+        else:
+            label.config(bg='yellow')
+            self.highlighted_positions.append((row, col))
+
+        self.check_highlighted_tiles()
+
+    def toggle_highlight(self, event, label):
+        info = label.grid_info()
+        row, col = info['row'], info['column']
+
+        if (row, col) in self.highlighted_positions:
+            label.config(bg='SystemButtonFace')
+            self.highlighted_positions.remove((row, col))
+        else:
+            label.config(bg='yellow')
+            self.highlighted_positions.append((row, col))
+
+        self.check_highlighted_tiles()
+
+    def strikethrough_output_text(self, found_words):
         # Remove strike-through from all text first
         self.output_text.tag_remove("strike", "1.0", tk.END)
 
@@ -336,17 +404,6 @@ class WordSearchGUI(tk.Tk):
         self.print_highlighted_labels()
         self.check_highlighted_tiles()
 
-    def highlight_label(self, label):
-        info = label.grid_info()
-        row, col = info['row'], info['column']
-
-        if (row, col) in self.highlighted_positions:
-            label.config(bg='SystemButtonFace')
-            self.highlighted_positions.remove((row, col))
-        else:
-            label.config(bg='yellow')
-            self.highlighted_positions.append((row, col))
-
     def print_highlighted_labels(self):
         if self.highlighted_labels:
             print("Highlighted Labels:")
@@ -366,7 +423,7 @@ class WordSearchGUI(tk.Tk):
                 if word_positions_set.issubset(highlighted_positions_set):
                     found_words.append(word)
         print("Found words:", found_words)
-        self.strike_through_output_text(found_words)
+        self.strikethrough_output_text(found_words)
 
 
 def main():
