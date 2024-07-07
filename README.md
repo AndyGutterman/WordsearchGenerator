@@ -13,6 +13,10 @@
    - Launch anywhere using `wordsearchGUI`
    - Alternatively, launch the command line version:  `wordsearchCLI`
      
+![image_01 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/195f224aeeba2ce549a9acd0f7e684171eb94eb7/demo_images/image_01.jpg "Select a size and enter words")
+
+![image_02 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/195f224aeeba2ce549a9acd0f7e684171eb94eb7/demo_images/image_02.jpg "Generate and search")
+
 
 ## Requirements
 - Python 3.x
