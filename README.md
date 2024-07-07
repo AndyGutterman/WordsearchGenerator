@@ -13,9 +13,9 @@
    - Launch anywhere using `wordsearchGUI`
    - Alternatively, launch the command line version:  `wordsearchCLI`
      
-![image_01 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/195f224aeeba2ce549a9acd0f7e684171eb94eb7/demo_images/image_01.png "Select a size and enter words")
+![image_01 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/main/demo_images/image_01.PNG "Select a size and enter words")
 
-![image_02 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/195f224aeeba2ce549a9acd0f7e684171eb94eb7/demo_images/image_02.png "Generate and search")
+![image_02 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/main/demo_images/image_02.PNG "Generate and search")
 
 
 ## Requirements
