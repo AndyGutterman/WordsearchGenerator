@@ -1,7 +1,6 @@
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-
 from WordSearch import WordSearch
 
 
@@ -15,9 +14,10 @@ class FileOutputHandler:
             filetypes=[("Text files", "*.txt")]
         )
         if file_path:
+            self.parent.hide_customization_elements()
+
             with open(file_path, 'r') as f:
                 lines = f.readlines()
-
             grid = []
             words = []
             in_wordbank = False
@@ -35,12 +35,14 @@ class FileOutputHandler:
                     grid.append(line.split())
 
             size = len(grid)
+            self.parent.adjust_output_text_for_size(self.parent.output_text, size)
             self.parent.word_search = WordSearch(size)
             self.parent.word_search.grid = grid
             self.parent.word_search.words = words
             self.parent.show_word_search()
             self.parent.show_wordbank()
             messagebox.showinfo("File Loaded", f"Word search loaded from {file_path}")
+
             self.parent.update_size_buttons_state(False)
             self.parent.update_word_buttons_state(False)
             self.parent.filemenu.entryconfig("Save as...", state=tk.DISABLED)
@@ -66,6 +68,3 @@ class FileOutputHandler:
                     f.write(word + '\n')
 
             messagebox.showinfo("File Saved", f"Word search saved as {file_path}")
-
-
-
