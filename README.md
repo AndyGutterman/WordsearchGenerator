@@ -10,7 +10,7 @@
 3. Install using `pip install -e .`
 
 ## How To Use
-   - Launch anywhere using `wordsearchGUI`
+   - Launch anywhere using `wordsearchGUI` (Recommended)
    - Alternatively, launch the command line version:  `wordsearchCLI`
      
 ![image_01 failed to load](https://raw.githubusercontent.com/AndyGutterman/WordsearchGenerator/main/demo_images/image_01.PNG "Select a size and enter words")
